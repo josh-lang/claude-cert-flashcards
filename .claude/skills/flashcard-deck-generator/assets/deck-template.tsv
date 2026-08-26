@@ -1,0 +1,10 @@
+#separator:tab
+#html:true
+#deck:Flashcards::Example
+#tags:source::example
+#columns:guid	notetype	field1	field2	tags
+#guid column:1
+#notetype column:2
+#tags column:5
+1b81b5601f344db36127275ad24eb44f4a0a783a	Basic	What is the capital of Italy?	Rome	topic::geography
+6a89fdcbbe101d09b8ef610c830aa250b6e19254	Cloze	{{c1::Rome}} is the capital of {{c2::Italy}}.	Source: example.md	topic::geography
