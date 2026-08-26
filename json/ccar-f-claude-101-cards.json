@@ -1,0 +1,758 @@
+{
+ "schema_version": 1,
+ "deck": "CCAR-F::Claude 101",
+ "default_notetype": "basic",
+ "tags": [
+  "source::claude-101",
+  "ccar-f"
+ ],
+ "media_dir": ".",
+ "cards": [
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You lead operations at a regional insurance office and are showing a skeptical colleague where Claude adds value beyond a search engine. You list four requests your team made this week.\n\nWhich request benefits most from Claude as a thinking partner rather than a search-style lookup?\n\nA. What is today's exchange rate from US dollars to euros, and which source published it?\nB. How many working days fall between March 3 and March 24, excluding public holidays?\nC. Here is a pasted customer complaint thread — help me work out what the customer actually wants before I reply.\nD. What is the difference between a purchase order and an invoice, and which one comes first?",
+    "Back": "<b>Correct Answer: C.</b> Option C requires Claude to reason over material you bring — the complaint thread — and to refine its read through back-and-forth, which is the thinking-partner work Claude adds beyond lookup: the answer needs your situation in it, not a public fact. Option A is a single live fact from one authoritative source, a search box's home ground. Option B is a one-line calculation with nothing of yours in it. Option D is a generic definition that reads the same for everyone; it only becomes thinking-partner work once your specific situation, such as an invoice that arrived without a purchase order, enters the question.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/claude\">Claude (product page)</a>"
+   },
+   "tags": [
+    "domain::d4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "basics-thinking-partner-vs-search",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A financial analyst on your team wants Claude to analyze a 300-page annual report plus two appendices in a single conversation and answer questions that draw on all of it. She is surprised this is even possible.\n\nWhich capability makes this possible?\n\nA. Claude permanently memorizes every uploaded document and recalls it in all later conversations.\nB. Claude's large context window can take in hundreds of pages at once, so the whole report informs its answers.\nC. Claude compresses each upload into a one-page summary and discards the original text before answering.\nD. Claude locates a copy of the same report on the public web and reads that version instead.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: Claude's large context window can ingest 200K+ tokens — roughly 500 pages of text — so extensive materials can be considered together within one conversation. Option A confuses the context window with memory; uploads inform the current conversation rather than being permanently memorized across all chats. Option C is not how uploads work — Claude parses the file's content rather than replacing it with a lossy summary. Option D is unnecessary and unreliable; the analyst already supplied the document, and the answers should come from the uploaded text, not a web copy.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/context-windows\">Context windows</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/glossary\">Claude glossary</a>"
+   },
+   "tags": [
+    "domain::d4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "basics-context-window-documents",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A product manager is weighing three roadmap options with competing tradeoffs. All the relevant data is already pasted into the chat, the decision is genuinely complex, and she cares far more about the quality of the reasoning than about response speed.\n\nWhich Claude capability best fits this request?\n\nA. Web search, so Claude gathers additional outside information before it weighs in.\nB. A shorter, simpler prompt, so Claude can respond faster and keep the meeting moving.\nC. Learning mode, so Claude asks her guiding questions instead of committing to a recommendation.\nD. Thinking, so Claude works through the tradeoffs step by step before it answers.",
+    "Back": "<b>Correct Answer: D.</b> Option D matches the situation: Thinking lets Claude take time to reason carefully before answering, which suits complex analysis where all the needed information is already in the conversation and quality matters more than speed. Option A adds outside information the problem does not need — the inputs are already pasted in. Option B optimizes for speed, the opposite of the stated priority, and stripping detail from the prompt would weaken the analysis. Option C redirects Claude toward coaching her reasoning rather than delivering the careful analysis she asked for; Learning mode withholds answers by design.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/claude\">Claude (product page)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/glossary\">Claude glossary</a>"
+   },
+   "tags": [
+    "domain::d4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "basics-thinking-capability",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An HR lead splits her week between an office desktop, a home laptop, and her phone during site visits. She hesitates to start a long-running conversation with Claude because she assumes the work will be stranded on whichever device she used first.\n\nWhat should she know about working across devices?\n\nA. When signed in, her conversations, projects, memory, and preferences sync across the web, desktop, and mobile apps.\nB. Conversations are stored per device, so she should export a transcript and re-import it on each machine she uses.\nC. The mobile app is view-only, so a conversation started on her phone cannot be continued on the desktop later.\nD. She needs a separate account per device, with an administrator merging the histories at the end of each week.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: Claude is available across web, desktop, and mobile apps, and conversations, projects, memory, and preferences sync across devices when you are signed in. Option B invents a manual export step the product does not require. Option C is false — the mobile app is a full interface for conversations, not a viewer. Option D describes an account model that does not exist and would defeat the purpose of syncing.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/claude\">Claude (product page)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "basics-cross-device-sync",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A high-school teacher wants her 28 students to use Claude while preparing for a debate, but worries they will simply harvest finished answers instead of building their own arguments.\n\nWhich approach best matches the teacher's goal?\n\nA. Tell students to keep every prompt under ten words so Claude cannot produce complete answers.\nB. Have students ask Claude for a confidence score on every claim so they know which ones to check.\nC. Allow one message per topic and no follow-ups, so each student receives only a single response.\nD. Have students use Learning mode, which guides their reasoning process instead of providing answers.",
+    "Back": "<b>Correct Answer: D.</b> Option D is the fit: Learning mode is a Claude experience designed to guide the user's reasoning process rather than hand over answers, which is exactly the critical-thinking outcome the teacher wants. Option A degrades the interaction without changing its answer-giving nature — short prompts just produce worse answers. Option B addresses verification rather than whether students do their own thinking, and self-reported confidence is not a reliable signal anyway. Option C removes the iterative dialogue that makes Claude useful for learning instead of redirecting it toward reasoning.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/claude\">Claude (product page)</a>"
+   },
+   "tags": [
+    "domain::d4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "basics-learning-mode",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A marketing manager prompts Claude with 'Write an email about the project delay' and gets a generic message that could apply to any company. The real situation: an enterprise client is facing a second two-week delay to a software integration and has been patient so far.\n\nWhat change to the prompt will most improve the result?\n\nA. Add the specifics — an enterprise client, a second delay, two weeks, and a professional but apologetic tone.\nB. Resubmit the identical prompt several times and keep whichever of the drafts reads least generically.\nC. Reply 'make it more professional' and repeat that instruction until the output finally improves.\nD. Move the request into a brand-new chat, since a fresh conversation tends to produce less generic writing.",
+    "Back": "<b>Correct Answer: A.</b> Option A targets the root cause: a generic response almost always means the prompt lacked context about the audience, situation, and constraints, and supplying those details is the course's prescribed fix. Option B is a lottery — regenerating without new information reproduces the same underspecified request. Option C adds a vague adjective rather than the concrete facts Claude is missing. Option D changes the venue, not the information; a new chat with the same thin prompt yields the same thin email.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct\">Be clear and direct</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "results-generic-add-context",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An HR lead asks Claude for weekly hiring updates and always wants the same layout: a bold header per open role, then three short bullets. Despite asking twice for 'a clean, scannable format,' Claude keeps returning flowing paragraphs.\n\nWhat is the most effective fix?\n\nA. Ask for the update in far fewer words, so there is no room for Claude to write paragraphs.\nB. Move the request to a new conversation, where Claude's formatting defaults will reset.\nC. Show the format — paste a past update laid out the desired way, or spell out the structure explicitly.\nD. Ask Claude to double-check its formatting against the request before it sends each response.",
+    "Back": "<b>Correct Answer: C.</b> Option C applies the course's rule for format problems: show, don't just tell. Claude understood what to write but not how to present it, and an example or an explicit structure ('a bold header per role, three bullets each') closes that gap. Option A constrains length, not layout — short prose is still prose. Option B does nothing, because the issue is the instruction rather than conversation state. Option D asks Claude to verify against a standard it still has not been given.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/multishot-prompting\">Use examples (multishot)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct\">Be clear and direct</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "results-format-show-example",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A financial analyst asked Claude about a niche regulatory reporting rule and later discovered that one confident-sounding detail in the response was wrong. She still wants to use Claude for this work, which feeds a report her director signs.\n\nWhich TWO practices should she adopt for this kind of high-stakes factual work? (Select TWO.)\n\nA. Judge reliability by tone — flag only the answers that sound hedged or uncertain for review.\nB. Enable web search and ask Claude to cite sources, so responses are grounded in checkable current information.\nC. Stop using Claude for anything factual and reserve it strictly for wording, tone, and formatting help.\nD. Independently verify the key facts before any of them go into the director's report.",
+    "Back": "<b>Correct Answer: B and D.</b> Options B and D are the course's guidance for exactly this failure: Claude can occasionally generate plausible but incorrect information, especially on specific facts or niche topics, so ground responses with web search and citations, and verify key facts independently for high-stakes work. Option A is backwards — a confident tone is not a reliability signal, which is precisely why the wrong detail slipped through unnoticed. Option C overcorrects, discarding the research-and-analysis value Claude provides when it is paired with verification.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations\">Reduce hallucinations</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/citations\">Citations</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "results-verify-high-stakes-facts",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A product manager has spent 12 turns trying to steer a draft one-pager. Along the way the conversation absorbed two abandoned outlines and several conflicting instructions, and each new response now mixes pieces of all of them.\n\nWhat is the fastest way to get back on track?\n\nA. Keep correcting within the same thread, since more accumulated context steadily improves the output.\nB. Ask Claude to disregard everything so far and then repeat the original prompt word for word.\nC. Start a new chat with one clearer prompt that consolidates the requirements learned from the failed turns.\nD. Turn on the Research feature so Claude gathers outside examples of well-structured one-pagers.",
+    "Back": "<b>Correct Answer: C.</b> Option C reflects the iteration mindset the course teaches: when a conversation has gone off track, it is often faster to open a new chat with a clearer prompt than to keep redirecting — and the failed turns have revealed exactly what the requirements are. Option A misreads context accumulation; the contradictory instructions in the history are the problem, not the cure. Option B keeps the tangled history in place and re-runs the same underspecified prompt that started the drift. Option D solves a different problem — no outside information is missing here.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct\">Be clear and direct</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "results-restart-off-track-chat",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A teacher prompts: 'Write a 250-word newsletter section in a warm, upbeat tone, formatted with a headline and two short paragraphs.' The output is polished but generic — it never lands with its real audience, parents of third-graders anxious about state-testing week.\n\nIn terms of the course's prompt framework, which element is missing?\n\nA. Defining the task — the prompt never actually says what Claude should produce.\nB. Specifying rules — the prompt gives Claude no guidance on style, length, or format.\nC. Iterating — the request should have been split across several shorter messages.\nD. Setting the stage — the prompt omits the writer's role, the audience, and the objective.",
+    "Back": "<b>Correct Answer: D.</b> Option D identifies the gap: the prompt defines the task (write a newsletter section) and specifies rules (length, tone, format) but never sets the stage — who is writing, who the parents are, and what the piece must accomplish during testing week — which is why the output is generic. Option A is wrong because the task is clearly stated. Option B is wrong because tone, length, and structure are all specified. Option C is not one of the framework's three elements, and splitting an underspecified request into pieces would not supply the missing context.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct\">Be clear and direct</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "results-missing-stage-setting",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A finance team wants to hand Claude a recurring task: drafting the monthly variance commentary that accompanies their reporting package. Before relying on it, the team lead wants evidence that Claude performs well on this specific task.\n\nWhat is the most practical way to find out?\n\nA. Run a lightweight eval: gather 5-10 past commentaries, prompt Claude with the same inputs, and compare its drafts to the originals.\nB. Ask Claude to rate its own competence at writing variance commentary on a 1-10 scale and proceed if it scores high.\nC. Adopt it for one live reporting cycle and treat the director's reaction to that month's package as the test.\nD. Poll other departments for anecdotes about how well Claude handled their documents and extrapolate from those.",
+    "Back": "<b>Correct Answer: A.</b> Option A is the course's eval approach: collect real examples of the task, create test prompts with the context you would naturally have, compare Claude's outputs against your originals, and refine from what you learn — building evidence before the task matters. Option B relies on self-assessment, which is not a meaningful performance signal. Option C runs the experiment in production, exposing a director-facing deliverable to unvetted output. Option D substitutes other teams' unrelated tasks for evidence about this one; performance is task-specific, which is why evals exist.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/ai-fluency\">AI Fluency course (Anthropic Academy)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "results-lightweight-eval",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An account manager starts 4-5 Claude chats each week for one client and begins every chat the same way: uploading the client's brand guidelines, two past deliverables, and a tone summary, then re-explaining the account context. She estimates this setup costs her 30 minutes a week.\n\nWhat is the best way to eliminate this repeated setup?\n\nA. Keep one never-ending chat for the client so the uploaded files remain in context indefinitely.\nB. Create a client project: upload the documents to its knowledge base and set instructions for tone and context.\nC. Create a custom skill that stores the client's past deliverables and account history so Claude applies them automatically in every chat.\nD. Ask Claude to memorize the three documents so they are available in every future conversation.",
+    "Back": "<b>Correct Answer: B.</b> Option B is what projects are for: a self-contained workspace whose knowledge base makes the uploaded files available to every chat inside it and whose instructions apply the account context and tone automatically — no re-uploading. Option A crams unrelated threads into one conversation that grows unwieldy and eventually drifts. Option C misuses skills, which encode repeatable procedures rather than storing a client's reference documents and history; that material is knowledge, and it belongs in a project. Option D overstates memory, which retains key context such as your role and preferences, not full reference documents to draw on.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/projects\">Projects announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "proj-when-to-create",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your HR team of six shares a project for drafting job descriptions, with templates and past postings already in its knowledge base. Output quality still varies because each member pastes different guidance about tone and structure into their own chats.\n\nHow do you make Claude's behavior consistent for everyone in the project?\n\nA. Publish a canonical prompt on the team wiki and ask each member to paste it at the start of every chat.\nB. Upload a 'tone guide' document to the knowledge base and rely on Claude to apply it in every conversation.\nC. Have each member set personal preferences in their own settings describing the team's desired tone.\nD. Write the tone, structure, and template requirements into the project instructions so they apply to every chat.",
+    "Back": "<b>Correct Answer: D.</b> Option D uses the mechanism built for this: project instructions guide Claude's behavior across all conversations in the project, so every member gets the same tone and structure without per-chat effort. Option A still depends on six people pasting correctly every time — the inconsistency the team already has. Option B puts behavioral rules in the knowledge base, which Claude draws on as reference material when relevant rather than applying as standing instructions in every chat. Option C is per-individual and applies to each member's conversations everywhere, so it neither standardizes the team nor scopes to this project.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/projects\">Projects announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "proj-instructions-consistency",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A research-support project has grown to 180 uploaded documents, and the team now sees an indicator that the knowledge base is large. A teammate warns that they must delete files or split the project before Claude 'stops seeing' their material.\n\nWhat actually happens as project knowledge approaches the context limit?\n\nA. The project scales automatically: Claude retrieves only the content relevant to each question, expanding capacity by up to 10x.\nB. The project stops accepting new uploads until enough older files are removed to bring it back under the limit.\nC. Claude silently narrows its attention to the ten most recently uploaded files and ignores everything older.\nD. Every chat must begin with the team manually selecting which files should load into context for that session.",
+    "Back": "<b>Correct Answer: A.</b> Option A describes the designed behavior: when project knowledge approaches the context window limit, Claude stops loading everything at once and instead searches the project's files, retrieving only what is relevant to the question (Retrieval Augmented Generation), which expands capacity by up to 10x while the experience stays the same. Option B invents an upload freeze that does not exist. Option C describes a silent recency cutoff the product does not use — retrieval is by relevance, not upload date. Option D adds a manual selection step that retrieval specifically makes unnecessary.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/projects\">Projects announcement (Anthropic)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/context-windows\">Context windows</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "proj-rag-scaling",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A 60-file client project keeps retrieving the wrong background document when the team asks strategy questions. Most files carry names like <code>final.pdf</code>, <code>report_v2.pdf</code>, and <code>notes(3).docx</code>.\n\nWhat is the most effective first fix?\n\nA. Re-upload the important file at the start of each chat so it takes precedence over the others.\nB. Split the project into a dozen smaller projects, one per document type, to shrink the search space.\nC. Rename files descriptively (for example <code>Q4-2025-Client-Strategy-Review.pdf</code>) and name the target document when asking.\nD. Paste the full text of the key documents into the project instructions so they are always loaded.",
+    "Back": "<b>Correct Answer: C.</b> Option C addresses the root cause: Claude uses file names to understand and retrieve the right information, so descriptive names — plus referencing a document by name in the question — directly improve retrieval at almost no effort. Option A works around one file once while leaving the underlying ambiguity for every other question. Option B is over-engineered restructuring before the low-effort fix has been tried, and it sacrifices cross-document synthesis. Option D abuses instructions as storage; instructions are for behavioral guidance, and stuffing documents into them bloats every conversation instead of letting retrieval find what is relevant.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/projects\">Projects announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "proj-descriptive-file-names",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "On a Claude for Work plan, a marketing lead is sharing a campaign project with eight colleagues. They should be able to open the project, chat with its knowledge, and read everything — but must not change the instructions or swap out knowledge files.\n\nWhich permission level should she grant?\n\nA. Owner, so colleagues feel full confidence that the project belongs to the team as much as to her.\nB. Can view, which lets members see contents, use the knowledge, and chat, without making any changes.\nC. Can edit, since chatting inside a shared project requires edit rights on the workspace.\nD. Can comment, a level that lets members chat and leave notes on the project but hides its knowledge files from them.",
+    "Back": "<b>Correct Answer: B.</b> Option B matches the requirement exactly: 'Can view' is read-only access with discussion rights — members can see project contents, access the knowledge, and chat, but cannot modify instructions or knowledge. Option A hands over full control, including who sees the project, which is the opposite of the constraint. Option C rests on a misconception — chatting does not require edit rights, and granting them would let anyone alter the instructions. Option D describes a permission level that does not exist, and hiding the knowledge files would defeat the purpose of chatting inside the project.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/projects\">Projects announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "proj-share-permission-level",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An operations manager is auditing how her 12-person team uses Claude and wants to know which of the team's workflows justify creating a dedicated project.\n\nWhich TWO workflows are the strongest candidates for a project? (Select TWO.)\n\nA. Monthly board-report drafting that always references the same ten background documents.\nB. A one-time request to reformat a single document into a different page layout.\nC. Client-email replies from four teammates that must always follow the same tone rules and template.\nD. An occasional quick check of a public fact, such as a currency conversion before a wire transfer.",
+    "Back": "<b>Correct Answer: A and C.</b> Options A and C meet the course's criteria for a project: A involves reference materials used repeatedly across chats (the same ten documents every month), and C involves consistent response requirements plus several people who benefit from shared instructions and context. Option B is a one-off task with no recurring knowledge or standing requirements — a plain chat handles it. Option D is a quick lookup that needs neither persistent knowledge nor instructions, so project overhead adds nothing.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/projects\">Projects announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "proj-candidate-workflows",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A product manager notices that some of Claude's outputs open in a dedicated window beside the conversation while others appear inline in the chat, and asks what determines the difference.\n\nWhen does Claude create an artifact?\n\nA. Only when the user explicitly includes the word 'artifact' somewhere in the request, never on its own initiative.\nB. When content is significant and self-contained — work the user is likely to edit, reuse, or reference later.\nC. Whenever a response runs longer than a single paragraph of ordinary conversational text, regardless of content.\nD. Only for interactive code with real logic and user input, never for written documents, diagrams, or images.",
+    "Back": "<b>Correct Answer: B.</b> Option B states the actual criteria: Claude automatically creates an artifact for significant, self-contained content (typically over 15 lines) that stands on its own and that you are likely to edit, iterate on, or reuse. Option A is wrong because creation is automatic — an explicit request is only the fallback when Claude does not create one on its own. Option C sets the bar far too low; ordinary conversational answers stay in the chat regardless of length. Option D is wrong because documents, diagrams, SVG images, and HTML pages are all artifact types, not just code.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/build-artifacts\">Artifacts announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "artifact-auto-creation-criteria",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A financial analyst asks Claude for two deliverables in one afternoon: a markdown project plan, which appears as an artifact she can watch update in a side window, and an Excel budget workbook, which arrives as a downloadable <code>.xlsx</code> file with no artifact window at all. She asks whether something went wrong.\n\nWhat explains the difference?\n\nA. The workbook exceeded the artifact size limit, so Claude automatically downgraded it to a plain download.\nB. Artifacts are disabled by default for finance-related content until a workspace admin enables them.\nC. Excel output depends on a Microsoft 365 connector, which she has not yet linked to her Claude account.\nD. Office documents and PDFs come from a separate file-creation capability and are returned as downloads, not artifacts.",
+    "Back": "<b>Correct Answer: D.</b> Option D is the actual design: artifacts cover content such as documents in markdown or plain text, code, HTML pages, SVG images, diagrams, and interactive components, while Word, Excel, PowerPoint, and PDF files are created through a separate file-creation capability and handed back as downloadable files. Option A invents a size-based downgrade path. Option B invents a content-category restriction that does not exist. Option C confuses file creation with connectors — no external integration is involved in generating an Excel file.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/build-artifacts\">Artifacts announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "artifact-office-files-not-artifacts",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A teacher had Claude build an interactive vocabulary-quiz page as an artifact. She has a list of six improvements: a new color scheme, a timer, larger fonts, shuffled questions, a score screen, and a print view. The last time she sent Claude a long batch of changes in one message, two of them came back missing and a layout problem appeared that she could not trace to any single request.\n\nWhat is the most effective way to get all six changes made well?\n\nA. Request the changes one at a time, checking the artifact after each so problems are easy to spot and attribute.\nB. Paste all six changes into a single message so the artifact is updated in one consistent pass.\nC. Start a fresh conversation and re-describe the entire quiz page with all six improvements built in from the start.\nD. Download the page and make the six edits herself in a text editor, then re-upload it for Claude to review.",
+    "Back": "<b>Correct Answer: A.</b> Option A follows the artifact best practice of iterating incrementally: one change at a time makes it easy to see what worked, catch issues early, and attribute any regression to the change that caused it — the very problem her last batched request produced. Option B is tempting for speed, but batching six modifications repeats the failure she already experienced: if the result is off, she cannot tell which request caused it. Option C throws away a working artifact and re-rolls everything from scratch, risking the parts that already worked. Option D abandons the collaborative loop and leaves the teacher hand-editing markup that Claude could revise conversationally.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/build-artifacts\">Artifacts announcement (Anthropic)</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "artifact-incremental-iteration",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A marketing manager built an interactive event-FAQ page as an artifact and published it, planning to send the link to 15 outside vendors who do not use Claude. A colleague warns her that publishing will expose the conversation that produced it.\n\nWhat is accurate about published artifacts?\n\nA. Publishing shares the artifact together with a full transcript of the conversation that produced it.\nB. Viewers must first create a free Claude account before the published link will open for them.\nC. Only the selected version is public; the chat stays private, viewers need no account, and search engines do not index it.\nD. Publishing is permanent and cannot be undone, so she should share only versions she considers final.",
+    "Back": "<b>Correct Answer: C.</b> Option C captures the publishing model: the selected version of the artifact becomes accessible to anyone with the link, the underlying chat remains private, no Claude account is needed to view it, and published artifacts are not indexed by search engines. Option A is the exact misconception the colleague has — the conversation is never exposed. Option B is wrong because public links work without an account, which is the point of sharing with outside vendors. Option D is wrong because you can unpublish at any time by returning to the artifact and removing public access.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/build-artifacts\">Artifacts announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "artifact-publish-privacy",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An HR lead asks Claude for a reusable onboarding-checklist template she plans to edit and share with three regional offices. Claude writes the whole checklist inline in the chat response instead of creating an artifact.\n\nWhat is the simplest way to get it as an artifact?\n\nA. Reply 'Please create that as an artifact' — an explicit request is all it takes in the same conversation.\nB. Ask a workspace admin to enable artifact creation for her account before trying the request again.\nC. Accept the inline version — text templates cannot be artifacts, since only code qualifies for the window.\nD. Start a new conversation, because Claude's artifact decision is fixed for the rest of the current chat.",
+    "Back": "<b>Correct Answer: A.</b> Option A is the course's troubleshooting guidance: if Claude does not automatically create an artifact when you expect one, simply ask — 'create this as an artifact' — and it will move the content into the artifact window. Option B invents an admin toggle for a behavior that needs none. Option C is false; text-heavy documents such as templates and plans are a primary artifact type. Option D is unnecessary because the decision is not locked — a one-line follow-up in the same conversation fixes it.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/build-artifacts\">Artifacts announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "artifact-explicit-request",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A sales-operations manager watches Claude turn her meeting notes into a polished 14-slide PowerPoint file and asks how Claude 'knew' the whole procedure for building a proper <code>.pptx</code> deck.\n\nWhat is running behind the scenes?\n\nA. A Microsoft 365 connector that must be linked to her account before Claude can produce the file.\nB. An Anthropic-built document-creation skill that Claude loads automatically when the task calls for it.\nC. The artifact window, which converts Claude's markdown response into PowerPoint format on download.\nD. A custom skill that someone in her organization must have created and uploaded beforehand.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: file-creation capabilities for Excel, PowerPoint, Word, and PDF are powered by Anthropic Skills — packaged expertise that Claude invokes automatically when relevant, with no manual selection. Option A confuses skills with connectors; producing a PowerPoint file requires no link to Microsoft services. Option C is wrong because Office files are not artifacts — they come from the separate file-creation capability and are returned as downloads. Option D is wrong because document creation is an Anthropic-maintained built-in, not something each organization must author.\n\n<i>Domain 3 (Claude Code Configuration & Workflows) · Task 3.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/skills\">Skills announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3",
+    "task::3-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "skill-builtin-document-creation",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A financial analyst runs the same quarterly variance analysis four times a year: nine steps, in a fixed order, ending in a specific output format her controller expects. She wants Claude to execute the methodology the same way every quarter.\n\nWhich approach best encodes this?\n\nA. Create a project and upload a document describing the nine steps to its knowledge base.\nB. Rely on Claude's memory to accumulate the steps over several quarters of conversations.\nC. Create a custom skill that encodes the nine-step methodology so Claude follows it whenever the task arises.\nD. Keep a master prompt in a spreadsheet and paste all nine steps into each new chat every quarter.",
+    "Back": "<b>Correct Answer: C.</b> Option C applies the course's dividing line — projects store knowledge, skills perform tasks. A repeatable, ordered methodology is procedural, exactly what a custom skill encodes so Claude executes it consistently every time. Option A treats the process as reference material; knowledge is drawn on when relevant rather than reliably executed as a step-by-step procedure. Option B stretches memory beyond its purpose of retaining key context such as role and preferences — it is not a place to encode a formal methodology. Option D works but reintroduces the manual, error-prone repetition that skills exist to remove.\n\n<i>Domain 3 (Claude Code Configuration & Workflows) · Task 3.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/skills\">Skills announcement (Anthropic)</a>\n&bull; <a href=\"https://agentskills.io/skill-creation/quickstart\">Skill creation quickstart</a>"
+   },
+   "tags": [
+    "domain::d3",
+    "task::3-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "skill-vs-project-process",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A brand manager with no technical background wants a custom skill that applies her company's brand-voice rules whenever Claude reviews marketing copy. She assumes building it means writing configuration files.\n\nWhat is the easiest way to create the skill?\n\nA. Only Anthropic can create skills, so she should submit a request through the support channel.\nB. Ask her IT department to code the skill's folder structure and upload the finished package for her.\nC. Author the skill's instruction files by hand, following the published specification line by line, then upload them.\nD. Describe the workflow to Claude in a chat, answer its questions, upload the brand guide, and save the file it generates.",
+    "Back": "<b>Correct Answer: D.</b> Option D is the course's recommended path: the easiest way to create a custom skill is through conversation — Claude interviews you about the workflow, incorporates uploaded reference materials like templates and style guides, and generates the properly structured skill file for you to save; no coding is required. Option A is wrong because custom skills exist precisely so users and organizations can create their own. Options B and C both assume manual technical authoring that conversational creation makes unnecessary — hand-building the structure is the hard path, not the requirement.\n\n<i>Domain 3 (Claude Code Configuration & Workflows) · Task 3.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://agentskills.io/skill-creation/quickstart\">Skill creation quickstart</a>\n&bull; <a href=\"https://www.anthropic.com/news/skills\">Skills announcement (Anthropic)</a>"
+   },
+   "tags": [
+    "domain::d3",
+    "task::3-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "skill-create-by-conversation",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An HR lead saved a custom skill that structures meeting notes into her team's format. A colleague asks whether she now has to remember to switch the skill on at the start of every conversation where she wants it.\n\nHow do skills get used in practice?\n\nA. Claude selects and invokes relevant skills automatically from the request — once enabled, no per-chat activation is needed.\nB. Each chat begins with a skill picker where the user must select every skill she wants active for that session.\nC. Skills only activate inside the project where they were created, so she must open that project first.\nD. The skill's instructions must be pasted into the prompt whenever she wants them applied to her notes.",
+    "Back": "<b>Correct Answer: A.</b> Option A is how skills work: Claude handles skill selection automatically based on your request — when a task is relevant, the skill loads, and you will see it mentioned as Claude works. Option B describes a manual activation flow that does not exist. Option C invents a project boundary; skills are enabled for your account, not scoped to one project. Option D defeats the purpose of skills, which is that the packaged instructions apply automatically instead of being re-pasted.\n\n<i>Domain 3 (Claude Code Configuration & Workflows) · Task 3.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/skills\">Skills announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3",
+    "task::3-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "skill-automatic-invocation",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An operations manager finds a custom skill file on a public forum that promises to automate her vendor-audit checklist and save three hours a week. She is tempted to install it immediately.\n\nWhat should she do first?\n\nA. Install it right away — skills are plain-text instructions, so there is nothing in them that can execute.\nB. Review the skill's contents to understand what it does and confirm the source is trustworthy before installing.\nC. Install it, but use it only inside a private project so that any problems stay contained there.\nD. Install it freely, since Anthropic reviews every uploaded custom skill before it is allowed to run.",
+    "Back": "<b>Correct Answer: B.</b> Option B is the course's security guidance: because skills can include executable code, install custom skills only from trusted sources and review the contents of anything from an external source before use. Option A rests on a false premise — skills are folders of instructions, scripts, and resources, and can include executable code. Option C misunderstands scoping; projects do not sandbox a skill's behavior. Option D is wrong because custom skills you upload are private to your account, not individually vetted by Anthropic — that review responsibility is yours.\n\n<i>Domain 3 (Claude Code Configuration & Workflows) · Task 3.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/skills\">Skills announcement (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3",
+    "task::3-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "skill-untrusted-source",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A product manager spends 30-40 minutes a day copying content out of her project tracker and team chat into Claude conversations so it has the context to draft status updates and answer questions.\n\nWhat is the best way to eliminate this manual shuttling?\n\nA. Create a project and upload weekly CSV exports of both tools to its knowledge base so every chat can reference them.\nB. Maintain a running summary document of both tools by hand and paste it into each conversation.\nC. Take a screenshot of each tool's dashboard every morning and attach the images to her first chat.\nD. Connect the tools so Claude can search and read them directly from within the conversation.",
+    "Back": "<b>Correct Answer: D.</b> Option D is what connectors are for: they give Claude access to the tools and data you already use, so it can search files, retrieve records, and — depending on the permissions granted — perform actions, all from within the conversation. Option A uses a real feature for the wrong job: a knowledge base holds reference material, and weekly exports leave Claude answering from data that is up to a week stale while still costing her the export step. Option B has her maintaining a second copy of her tools by hand, which is the overhead she is trying to remove. Option C delivers unstructured pixels once a day rather than live, searchable data.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/integrations\">Integrations/connectors (Anthropic)</a>\n&bull; <a href=\"https://modelcontextprotocol.io/docs/getting-started/intro\">MCP introduction</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "connect-eliminate-copy-paste",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "While setting up connectors, an operations director notices that tools as different as a document store, a chat platform, and a payment service all plug into Claude the same way, and asks how one assistant can integrate with so many unrelated products.\n\nWhat makes this possible?\n\nA. Anthropic hand-builds and privately maintains a bespoke integration for each individual product.\nB. Each connector ships with its own separate assistant that was trained specifically on that one tool.\nC. The Model Context Protocol (MCP), an open standard that gives any tool one consistent way to connect to Claude.\nD. A shared login — Claude signs in to each tool with her credentials and browses it the way a person would.",
+    "Back": "<b>Correct Answer: C.</b> Option C is the answer the course gives: connectors are powered by MCP, an open standard that works like USB-C for AI — one universal interface, so the developers of any tool can build a connector that works seamlessly with Claude. Option A describes a closed, bespoke model that an open standard specifically replaces, and it could never scale to a whole directory of tools. Option B misunderstands the architecture — the same Claude works across all connected tools. Option D describes credential sharing and interface browsing; connectors are authorized through each tool's own permission grant and exchange data through the protocol rather than by driving the tool's screens.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://modelcontextprotocol.io/docs/getting-started/intro\">MCP introduction</a>\n&bull; <a href=\"https://www.anthropic.com/news/model-context-protocol\">MCP announcement (Anthropic)</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "connect-mcp-open-standard",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A financial analyst wants Claude to work with two kinds of material: contract records in a cloud documentation service, and a folder of about 200 files stored locally on her computer.\n\nHow should she set up access?\n\nA. Both are web connectors, configured in the browser at claude.ai like any other cloud integration.\nB. A web connector for the cloud service, plus a desktop extension in the Claude Desktop app for the local files.\nC. Local files cannot be connected at all, so she must manually upload each one in every conversation.\nD. Desktop extensions for both, since extensions have superseded web connectors for every kind of source.",
+    "Back": "<b>Correct Answer: B.</b> Option B reflects the two connector types: web connectors link Claude to cloud services, while desktop extensions run locally through the Claude Desktop app and give Claude access to local files and native applications. Option A cannot cover the local folder — browser-configured web connectors reach cloud services, not her file system. Option C ignores desktop extensions, whose local file access exists precisely to avoid endless manual uploads. Option D gets the relationship wrong: the two types serve different territories and complement rather than replace each other.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/integrations\">Integrations/connectors (Anthropic)</a>\n&bull; <a href=\"https://modelcontextprotocol.io/docs/getting-started/intro\">MCP introduction</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "connect-web-vs-desktop",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A marketing team of nine is eager to connect its shared drive and chat workspace to Claude, but their director hesitates, worried that connecting will give Claude — and therefore every team member — unrestricted, permanent access to everything in those systems.\n\nWhich TWO facts accurately address the director's concern? (Select TWO.)\n\nA. Claude can only access data the connecting user already has permission to see in the underlying tool.\nB. Connected services are automatically restricted to read-only mode for the first 90 days after connection.\nC. Connectors grant organization-wide visibility, so sensitive folders should be moved out of connected tools first.\nD. Access is revocable at any time from Claude's settings or the service's own settings, and permissions can be toggled.",
+    "Back": "<b>Correct Answer: A and D.</b> Options A and D are the course's security model: Claude sees what you see — connecting your account exposes only data you already have access to, never someone else's inbox or restricted folders — and access is both scoped and revocable at any time from either side of the connection, with individual permissions that can be toggled. Option B invents a probationary read-only period that does not exist; what a connector can do is governed by the permissions granted, not a timer. Option C is the very misconception being corrected — connectors do not grant visibility beyond each user's existing permissions, so relocating folders is unnecessary.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/integrations\">Integrations/connectors (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>\n&bull; <a href=\"https://modelcontextprotocol.io/docs/develop/connect-remote-servers\">Connect to remote MCP servers</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-4",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "connect-scoped-revocable-access",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An HR lead finds an unofficial, community-built connector for her niche HR system on a personal blog. It is not listed in Claude's connector directory, and she wants the two hours a week it promises to save.\n\nWhat is the right approach before connecting it?\n\nA. Connect it — connectors are read-only by design, so the downside of a bad one is limited to wasted time.\nB. Connect it — anything that works with Claude has already been vetted and is maintained by Anthropic.\nC. Treat it as untrusted software: evaluate the source first, since connectors can read and sometimes modify her data.\nD. Connect it now and plan to revoke its access later if anything about its behavior ever seems off to her.",
+    "Back": "<b>Correct Answer: C.</b> Option C is the course's guidance: just as with skills, only install connectors from trusted sources — a connector operates with the access you grant, which can include reading and modifying data, so the source's trustworthiness is the gating question. Option A rests on a false premise, since connectors can take actions, not just read. Option B is wrong because the curated directory does not imply that every connector found elsewhere is vetted — this one is explicitly not listed there. Option D is backwards risk management: revoking access after the fact cannot undo what an untrustworthy connector already accessed.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/integrations\">Integrations/connectors (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "connect-untrusted-connector",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A product manager connected her project-management tool three weeks ago. Claude summarizes her task list flawlessly, but when she asks it to create a new task for the budget review, it reports that it cannot.\n\nWhat is the most likely explanation and fix?\n\nA. Connectors are read-only by design, so creating tasks will always have to be done by hand in the tool.\nB. The connector's granted permissions likely cover reading but not that action — review its permission settings and enable it.\nC. Write operations require the desktop-extension version of the connector rather than the web connector she set up.\nD. She should disconnect and reconnect the tool under a second account reserved specifically for write operations.",
+    "Back": "<b>Correct Answer: B.</b> Option B matches how connectors work: what Claude can do in a connected tool depends on the connector and the permissions you grant — reading and taking actions are distinct capabilities, and individual permissions can be toggled within the application's menu. Option A is false as a design claim; connectors can create content, update records, and execute tasks when permitted. Option C confuses the web/desktop split, which is about where tools live (cloud versus local), not read-versus-write capability. Option D adds account juggling that no part of the permission model requires.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/integrations\">Integrations/connectors (Anthropic)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "connect-action-permissions",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A new operations coordinator has questions in her first week: how to submit expenses, what was decided in last month's pricing discussions, and who owns the vendor-onboarding process. The answers are scattered across her company's document stores, chat threads, and email.\n\nWhich capability is purpose-built for these questions?\n\nA. Enterprise search — the 'Ask your org' project built to search and synthesize across connected company sources, with citations.\nB. The Research feature, which conducts a deep, multi-angle investigation of the question across the public web.\nC. A regular chat in which she pastes as detailed a description of the company as she can assemble on her own.\nD. An artifact that renders the employee handbook as an interactive, searchable page she can keep open.",
+    "Back": "<b>Correct Answer: A.</b> Option A is the designed fit: enterprise search adds a dedicated, preconfigured 'Ask your org' option that searches across connected company tools — documents, chat, email — and synthesizes cited answers, exactly the policy, decision, and who-owns-what questions of onboarding. Option B points the investigation at the public web, where none of these internal answers live. Option C depends on whatever the coordinator can paste, which is precisely what she does not yet know. Option D repackages one document, while her questions span many sources beyond any handbook.\n\n<i>Domain 5 (Context Management & Reliability)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://support.claude.com/en/articles/12489464-use-enterprise-search\">Use Enterprise Search (Claude Help Center)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>\n&bull; <a href=\"https://www.anthropic.com/claude\">Claude (product page)</a>"
+   },
+   "tags": [
+    "domain::d5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "search-org-knowledge-fit",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A finance director learns her company is enabling enterprise search and objects: the connected drive contains payroll folders, and she assumes anything connected becomes searchable by all 400 employees.\n\nHow does enterprise search actually handle access?\n\nA. All connected content becomes searchable by all members, so sensitive folders must be disconnected first.\nB. Results respect each user's existing permissions in the source tools, and connected data is not indexed or stored separately.\nC. Content is copied into a separate Claude-managed index, where the source system's permissions no longer apply to it.\nD. Access is controlled by asking employees to avoid searching for sensitive topics such as compensation.",
+    "Back": "<b>Correct Answer: B.</b> Option B is the security model: enterprise search only shows what the asking user already has permission to access in the original connected tool, conversations remain private, and connected data is not indexed or stored separately. Option A is the misconception being corrected — connection does not flatten permissions. Option C describes a shadow-copy architecture that is the opposite of how the feature works. Option D is policy by request rather than enforcement; a stated norm would not technically prevent access, and it is not how the product controls anything.\n\n<i>Domain 5 (Context Management & Reliability)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://support.claude.com/en/articles/12489464-use-enterprise-search\">Use Enterprise Search (Claude Help Center)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "search-permission-model",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A recruiter's company announced that enterprise search is set up, and 'Ask Meridian' now appears starred in her sidebar. Her first questions return thin results that miss documents and threads she knows exist.\n\nWhat is the most likely reason?\n\nA. The admin's configuration is the only setup step, so these thin results are as complete as they will ever get.\nB. Enterprise search only covers content created after the feature was enabled, so older material is invisible.\nC. She must upload the missing documents into the project's knowledge base herself before they become searchable.\nD. Setup is two-step: after the admin configures the org's tools, each user authenticates their own services for fuller results.",
+    "Back": "<b>Correct Answer: D.</b> Option D explains the thin results: enterprise search requires an admin to configure the organization's connectors and then each user to authenticate with the services they want searched; until the recruiter completes her own guided onboarding and connects her accounts, Claude cannot search those sources for her, and she can add more connectors later for broader coverage. Option A misses the second, per-user step entirely. Option B invents a start-date restriction that does not exist. Option C misunderstands the feature — it searches connected tools where content already lives, not a manually maintained upload set.\n\n<i>Domain 5 (Context Management & Reliability)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://support.claude.com/en/articles/12489464-use-enterprise-search\">Use Enterprise Search (Claude Help Center)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "search-user-authentication-step",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A benefits manager must recommend one of three payroll providers to her CFO in two weeks. She needs pricing, implementation timelines, and support quality compared across all three, with sources she can hand to procurement for verification.\n\nWhich capability fits this task?\n\nA. A quick web search, since each provider's pricing page is public and easy to find.\nB. Thinking, so Claude reasons carefully through which provider is the best overall choice.\nC. Research, which runs a multi-search, multi-source investigation and delivers a synthesized, cited report.\nD. A normal chat asking Claude to recall what it already knows about each of the three providers.",
+    "Back": "<b>Correct Answer: C.</b> Option C matches every signal in the stem: comparative analysis across multiple criteria, information that must be gathered from many sources, synthesis into one deliverable, and verifiable citations — the profile of a Research task. Option A is sized for a single quick fact from one or two sources, not a three-vendor, three-criteria comparison. Option B is for problems solvable by reasoning alone; this task's bottleneck is gathering current outside information, which Thinking does not do. Option D relies on recall without gathering or citing current sources, exactly the wrong basis for a procurement-facing recommendation.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/research\">Research feature (Anthropic)</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "research-vs-quick-search",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A product manager kicks off her first Research run and is surprised to watch progress indicators for several minutes instead of getting the near-instant answer she is used to from a normal chat.\n\nWhy does Research take this long?\n\nA. Research queues each request behind other users' investigations, so wait time depends on demand.\nB. Research is agentic and multi-step: Claude plans, runs many searches that build on each other, then synthesizes.\nC. Research reads the entire public web before it begins writing, which takes minutes at a minimum.\nD. The first run of any new feature is slow while results are cached, and later runs will be near-instant.",
+    "Back": "<b>Correct Answer: B.</b> Option B describes what the time buys: Research plans its approach with Thinking, conducts multiple searches where each round is informed by what the last one found — sometimes across hundreds of sources — pursues leads and fills gaps autonomously, and then synthesizes everything into a cited report; that work is not instant by nature. Option A attributes the delay to queueing rather than to the investigation itself. Option C overstates the process; Claude searches selectively and iteratively, not exhaustively. Option D invents a caching warm-up that has nothing to do with why a multi-search investigation takes minutes.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/research\">Research feature (Anthropic)</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "research-agentic-process",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A marketing manager used Research to produce a 20-page competitive brief she will present to leadership in three days. Before circulating it, she wants confidence that its factual claims hold up.\n\nWhat is the most reliable way to check the report?\n\nA. Ask Claude to append a confidence percentage to each claim and review only the low-scoring ones.\nB. Re-run the identical Research prompt and keep only the claims that appear in both reports.\nC. Accept the findings as they stand, since Research already cross-references multiple sources.\nD. Use the citations attached to the report's claims to spot-check the underlying sources directly.",
+    "Back": "<b>Correct Answer: D.</b> Option D uses the feature built for this: every claim in a Research report links back to its source, making verification fast — she can open the citations behind the claims that matter most and confirm them herself. Option A leans on self-reported confidence, which is not a dependable signal of accuracy. Option B is slow and can simply reproduce the same error twice, providing consistency rather than truth. Option C outsources her accountability; cross-referencing during research reduces errors but does not replace human verification before a leadership presentation.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/research\">Research feature (Anthropic)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/citations\">Citations</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations\">Reduce hallucinations</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "research-verify-citations",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An office manager is about to launch a Research run to plan a 20-person team offsite. Her draft prompt reads, in full: 'Tell me about team offsite options.' A colleague suggests investing another five minutes in the prompt, since the run itself will take a while.\n\nWhich TWO changes would most improve the report she gets back? (Select TWO.)\n\nA. Add a line telling Claude to skip citations so the report reads as a cleaner narrative.\nB. State the specific goal and constraints — group size, budget range, dates, and acceptable travel radius.\nC. Specify the structure she wants, such as sections for venue options, costs, logistics, and a recommendation.\nD. Ask for the longest possible report so that no option is left out.",
+    "Back": "<b>Correct Answer: B and C.</b> Options B and C are the course's prompt strategies for Research: be specific about goals and include relevant constraints (budget, timeline, geography) so Claude investigates options that actually fit, and specify the sections you want because Claude organizes its findings around the structure you provide. Option A strips out the citations she needs to verify venues and prices before committing budget, trading verifiability for polish. Option D confuses length with usefulness — without goals or constraints, a longer report is just a longer list of options that may not fit her group, budget, or dates.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/research\">Research feature (Anthropic)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct\">Be clear and direct</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-6",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "research-prompt-goals-structure",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A program manager wants one briefing that combines what her own team has already discussed about 'Project Atlas' in email and internal documents with current industry best practices from the public web. Her workspace tools are connected to Claude.\n\nHow should she approach this?\n\nA. Run Research once, steering it to pull from her connected email and documents and then research web best practices.\nB. Research reaches only the public web, so she should paste the internal threads into the prompt beforehand.\nC. Run Research for the web half, upload the internal documents to a separate chat, and merge the outputs by hand.\nD. Internal sources are reachable only through enterprise search, so a combined briefing is not possible in one run.",
+    "Back": "<b>Correct Answer: A.</b> Option A uses Research as designed: with integrations connected, Research pulls context from your emails, calendar, and documents alongside web research in a single investigation, and you can steer it by naming the sources to draw from — for example, 'summarize what has been discussed about Project Atlas across my email and documents, then research industry best practices for similar initiatives.' Option B understates the feature — connected integrations are exactly how Research reaches internal context without pasting. Option C splits one supported workflow into two manual halves and pushes the synthesis onto her. Option D confuses two capabilities; enterprise search is one way to query org knowledge, but Research can also draw on connected integrations while investigating the web.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/news/research\">Research feature (Anthropic)</a>\n&bull; <a href=\"https://www.anthropic.com/news/integrations\">Integrations/connectors (Anthropic)</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "research-with-integrations",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Every Monday an operations manager spends about 45 minutes on the same routine: checking messages, pulling numbers from a spreadsheet, assembling a status document, and prepping for the day's meetings. The steps never change, and the output is a formatted document her team expects by 9 a.m.\n\nWhat is the most effective way to work with Claude on this?\n\nA. Run it turn by turn in a chat each Monday morning, asking Claude one question for each step of the routine.\nB. Hand it off once as a scheduled task, so Claude runs the sequence on cadence and delivers the document for her review.\nC. Ask Claude to summarize each meeting after it happens instead of preparing the Monday status document at all.\nD. Dictate the routine by voice each Monday morning so the same steps take less typing time to work through.",
+    "Back": "<b>Correct Answer: B.</b> Option B recognizes the shape of the work: a multi-step sequence, a real deliverable, and a recurring schedule are the signals for handing work off rather than chatting — set it up once as a scheduled task and Claude gathers the inputs, produces the document, and she reviews the result. Option A keeps her stitching the steps together manually every week, which is the 45 minutes she is trying to reclaim. Option C changes the deliverable rather than automating it. Option D changes the input method while leaving the manual, step-by-step Monday routine fully intact.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://anthropic.skilljar.com/introduction-to-claude-cowork\">Introduction to Claude Cowork (Anthropic Academy)</a>\n&bull; <a href=\"https://www.anthropic.com/claude\">Claude (product page)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "role-recurring-handoff",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A financial analyst inherited a 12-tab workbook from a departed colleague. She needs the calculation flows explained and several assumptions updated without breaking the formula dependencies — and she wants to stay inside the spreadsheet while doing it.\n\nWhich way of working with Claude best fits?\n\nA. Upload the workbook to a claude.ai chat and download a freshly generated copy after each round of changes.\nB. Paste screenshots of each tab into a conversation and transcribe the suggested changes back into the file.\nC. Use Claude for Excel, whose sidebar works in the open workbook — explaining formula flows and updating inputs in place.\nD. Rebuild the model from scratch in a new file so there are no legacy formulas or dependencies to worry about.",
+    "Back": "<b>Correct Answer: C.</b> Option C matches both constraints: Claude for Excel brings Claude into the spreadsheet as a sidebar, where it can explain how formulas and calculation flows work across sheets and update inputs while preserving formula relationships — editing in place rather than round-tripping files. Option A works for analysis but produces a new downloaded version each cycle instead of working in the open file, exactly the workflow she wants to avoid. Option B gives Claude flat images of a live model and leaves every edit to manual transcription. Option D discards a working, if opaque, model and is a far bigger project than understanding and extending it.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/claude\">Claude (product page)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "role-excel-in-place",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A marketing manager returns from a week away to find that a campaign decision unfolded across four long Slack threads totaling several hundred messages. She needs to catch up and post an informed reply, without leaving Slack or forwarding the content elsewhere.\n\nWhat is the best way to use Claude here?\n\nA. Copy each thread into a claude.ai conversation, get a summary, and paste her drafted reply back into Slack.\nB. Ask IT for a weekly export of channel history so she can review the decision in a separate document.\nC. Start a Research run on the campaign topic so Claude can reconstruct what was decided from outside sources.\nD. Tag Claude in the threads so it summarizes the discussions and helps draft her reply where the conversation lives.",
+    "Back": "<b>Correct Answer: D.</b> Option D is the purpose-built fit: Claude Tag brings Claude into Slack, where tagging it in a thread lets it summarize lengthy discussions, break down what was decided, and help draft responses without leaving the workspace — meeting her stay-in-Slack constraint. Option A reaches the same information the long way, with manual copying that her constraint rules out. Option B introduces delay and an export process for something Claude can read in place. Option C points an investigation at the public web when the needed context is the internal threads themselves.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/claude\">Claude (product page)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "role-slack-tag",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Between back-to-back meetings, a product manager is staring at an unfamiliar KPI dashboard in a vendor tool. She needs the metrics explained in the next five minutes, while keeping the dashboard on screen.\n\nWhat is the fastest way to get Claude's help on her desktop?\n\nA. Use the desktop app's quick entry to pull Claude up over her work and share a screenshot so it can explain what she sees.\nB. Retype the dashboard's metric names and current values into a browser chat tab and ask for an explanation.\nC. Set up a connector for the vendor tool first so Claude can query the underlying data source directly.\nD. Create a scheduled task that analyzes the dashboard every week and reports the trends back to her.",
+    "Back": "<b>Correct Answer: A.</b> Option A uses the desktop app's native strengths for exactly this moment: quick entry pulls Claude up over whatever you are working on in a compact window that stays on top, and a screenshot or shared window lets Claude see what you see — no transcription, dashboard still in view. Option B is slow, error-prone manual copying that loses the visual layout. Option C is heavy setup for a five-minute question, and a connector for a niche vendor tool may not even exist. Option D solves a recurring-reporting problem she does not have; the need is immediate and one-time.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/claude\">Claude (product page)</a>\n&bull; <a href=\"https://support.claude.com/en/\">Claude Help Center</a>"
+   },
+   "tags": [
+    "domain::d3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-101",
+    "slug": "role-desktop-quick-entry",
+    "ordinal": 1
+   },
+   "media": []
+  }
+ ]
+}

@@ -1,0 +1,686 @@
+{
+ "schema_version": 1,
+ "deck": "CCAR-F::Claude with Google Vertex",
+ "default_notetype": "basic",
+ "tags": [
+  "source::claude-with-google-vertex",
+  "ccar-f"
+ ],
+ "media_dir": ".",
+ "cards": [
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your retail analytics team is moving a service from the Claude API to Claude on Vertex AI. The service builds Messages API requests by hand with an HTTP client. After pointing it at the Vertex <code>rawPredict</code> endpoint, every request is rejected with a validation error, even though the <code>messages</code>, <code>max_tokens</code>, and <code>tools</code> fields are unchanged.\n\nWhich TWO changes to the request are required for Vertex AI? (Select TWO.)\n\nA. Remove <code>model</code> from the JSON body and specify the model in the endpoint URL path instead.\nB. Send <code>anthropic-version: vertex-2023-10-16</code> as an HTTP header in place of the Claude API header value.\nC. Add <code>anthropic_version</code> to the JSON body with the value <code>vertex-2023-10-16</code>.\nD. Prefix the model name with <code>publishers/anthropic/</code> inside the <code>model</code> field of the body.",
+    "Back": "<b>Correct Answer: A and C.</b> Options A and C are the two documented differences between the Claude API and Claude on Vertex AI: the model is part of the Google Cloud endpoint URL (<code>.../publishers/anthropic/models/&lt;model&gt;:rawPredict</code>) rather than the body, and <code>anthropic_version</code> is passed in the body with the fixed value <code>vertex-2023-10-16</code> rather than as a header; everything else in the Messages API body is the same. Option B keeps the version in a header; on Vertex the version is read from the <code>anthropic_version</code> body field, so a header does not satisfy the requirement whatever value it carries. Option D keeps the model in the body, which Vertex does not accept; the publisher path belongs in the URL.\n\n<i>Domain 2 (Tool Design & MCP Integration)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai\">Claude on Vertex AI</a>\n&bull; <a href=\"https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude\">Use Claude on Vertex AI (Google Cloud docs)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "plat-request-shape-model-url-version-body",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A logistics team's Vertex AI integration works with <code>claude-sonnet-4@20250514</code>. A developer copies a model string from a Claude API example, <code>claude-sonnet-4-20250514</code>, into the same <code>AnthropicVertex</code> client, and every request now fails with a not-found error, although the model is enabled in Model Garden.\n\nWhat is the cause?\n\nA. The Vertex publisher model ID must carry an <code>anthropic.</code> prefix so the platform can identify the publisher.\nB. The model name must also be supplied in the <code>anthropic_version</code> body field for Vertex to resolve it.\nC. Dated model versions are not addressable on Vertex; only alias names such as <code>claude-sonnet-4</code> are accepted.\nD. Vertex publisher model IDs use <code>@</code> before the version date, so the hyphenated Claude API form does not resolve.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: Vertex AI publisher model IDs take the form <code>claude-sonnet-4@20250514</code>, where <code>@</code> separates the model name from its version date, so the hyphenated Claude API ID does not match any publisher model in the endpoint path. Option A describes the Amazon Bedrock naming convention, not Vertex. Option B misuses <code>anthropic_version</code>, which carries the fixed API version string <code>vertex-2023-10-16</code>, never a model name. Option C is wrong: dated versions are exactly how Vertex publisher models are addressed.\n\n<i>Domain 2 (Tool Design & MCP Integration)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai\">Claude on Vertex AI</a>\n&bull; <a href=\"https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/claude\">Claude models on Vertex AI (Google Cloud docs)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/models/overview\">Models overview</a>"
+   },
+   "tags": [
+    "domain::d2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "plat-model-id-version-separator",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your media company's content pipeline runs on Cloud Run and must call Claude through Vertex AI in your Google Cloud project. A developer instantiates the standard <code>anthropic.Anthropic()</code> client, sets <code>base_url</code> to the Vertex AI endpoint, and passes the model in <code>messages.create()</code>. Requests fail because the body still carries <code>model</code> and lacks the Vertex API version field.\n\nWhat is the correct way to use the Anthropic SDK here?\n\nA. Install <code>anthropic[vertex]</code> and create <code>AnthropicVertex(project_id=..., region=...)</code>, which targets the publisher endpoint for you.\nB. Keep the <code>Anthropic</code> client, set <code>base_url</code> to the regional endpoint, and add <code>anthropic_version</code> through <code>extra_body</code> on every call.\nC. Use the Google GenAI SDK's Gemini <code>generate_content</code> method with the Claude model ID as the model name.\nD. Keep the <code>Anthropic</code> client and pass the Google Cloud project ID as the <code>api_key</code> so requests are attributed to the project.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: the SDK ships a Vertex-specific client, <code>AnthropicVertex</code>, installed through the <code>anthropic[vertex]</code> extra and constructed with your <code>project_id</code> and <code>region</code>; it places the model in the publisher endpoint URL, adds <code>anthropic_version</code>, and picks up your Google Cloud credentials, so <code>messages.create()</code> calls stay unchanged. Option B still sends <code>model</code> in the body and targets the wrong path. Option C is Gemini's request format, not the Messages API that Claude expects. Option D confuses a project ID with an API key; Vertex is not authenticated that way.\n\n<i>Domain 2 (Tool Design & MCP Integration)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai\">Claude on Vertex AI</a>\n&bull; <a href=\"https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude\">Use Claude on Vertex AI (Google Cloud docs)</a>"
+   },
+   "tags": [
+    "domain::d2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "plat-sdk-anthropic-vertex-client",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A retail analytics assistant on Vertex AI is pinned to a single region with <code>region=\"us-central1\"</code>. During peak hours about 4% of requests fail with resource-exhausted errors while other regions have capacity. The team has no data-residency requirement and does not use provisioned throughput.\n\nWhat is the most appropriate change?\n\nA. Add a retry loop with exponential backoff that resends each failed request to the same region up to five times.\nB. Create the client with <code>region=\"global\"</code> so requests are dynamically routed to regions with available capacity.\nC. Switch to a smaller Claude model so that each request consumes less of the regional capacity.\nD. Deploy a second client for a backup region and alternate requests between the two regions.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: the global endpoint routes each request dynamically to a region with available capacity, which is exactly what maximizes availability when residency is flexible, and the SDK selects it when <code>region</code> is <code>\"global\"</code>. Option A keeps retrying an exhausted region and only delays the failures. Option C changes the model rather than the capacity problem and may reduce quality. Option D reimplements a crude version of what the global endpoint already does, with only two regions and extra client logic.\n\n<i>Domain 1 (Agentic Architecture & Orchestration)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai\">Claude on Vertex AI</a>\n&bull; <a href=\"https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude\">Use Claude on Vertex AI (Google Cloud docs)</a>"
+   },
+   "tags": [
+    "domain::d1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "plat-global-endpoint-availability",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are standing up a new Google Cloud project for a logistics operations assistant. Gemini requests from the project succeed, but the first request to a Claude publisher model through <code>AnthropicVertex</code> is rejected with an error saying the model is not accessible to the project.\n\nWhat is the most likely missing setup step?\n\nA. Setting the client's <code>region</code> parameter to the same region in which the project's other Vertex resources were created.\nB. Adding <code>anthropic_version</code> to the request body so that Vertex recognizes the publisher.\nC. Enabling that Claude model in Vertex AI Model Garden, which must be done per model before it can be called.\nD. Installing the <code>google-genai</code> package alongside the Anthropic SDK so the project can reach partner models.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: Claude models are partner models in Model Garden; you search for Anthropic, open the model, and click Enable (if no Enable button appears, access already exists). Until that is done the project cannot call the model even though other Vertex services work. Option A: region affects availability, not project access. Option B: the SDK already sends <code>anthropic_version</code>, and it does not grant access. Option D: the Google GenAI SDK is not needed to call Claude through the Anthropic SDK.\n\n<i>Domain 1 (Agentic Architecture & Orchestration)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://cloud.google.com/vertex-ai/generative-ai/docs/model-garden/explore-models\">Vertex AI Model Garden (Google Cloud docs)</a>\n&bull; <a href=\"https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/claude\">Claude models on Vertex AI (Google Cloud docs)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai\">Claude on Vertex AI</a>"
+   },
+   "tags": [
+    "domain::d1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "plat-model-garden-enable-model",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your media company's pipeline calls Claude on Vertex AI with <code>region=\"global\"</code> in development. For production, compliance asks that requests stay in one specific Google Cloud region. After switching the client to that region, calls to the same enabled model return not-found errors, while a different Claude model works there.\n\nWhat best explains this, and what should you do?\n\nA. Regional endpoints require the <code>anthropic.</code> model prefix; add the prefix and keep the chosen region.\nB. The model must be re-enabled separately in each region from that region's Model Garden page.\nC. Regional endpoints serve only the newest model; upgrade to the latest model ID and keep the region.\nD. Model availability varies by region; check Model Garden for regions that offer this model and choose one that meets compliance.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: not every Claude model is offered in every region. The global endpoint hides this because it routes dynamically, but a regional endpoint only serves models available in that region, so you must choose a region that both offers the model and satisfies the residency requirement. Option A applies a Bedrock convention. Option B is wrong: enablement is per project, not per region. Option C invents a rule; availability is per model per region, not tied to recency.\n\n<i>Domain 1 (Agentic Architecture & Orchestration)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/claude\">Claude models on Vertex AI (Google Cloud docs)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai\">Claude on Vertex AI</a>\n&bull; <a href=\"https://cloud.google.com/vertex-ai/generative-ai/docs/model-garden/explore-models\">Vertex AI Model Garden (Google Cloud docs)</a>"
+   },
+   "tags": [
+    "domain::d1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "plat-region-model-availability",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A logistics operations assistant on Vertex AI must answer two kinds of questions: procedures from 900 internal standard-operating-procedure documents stored in Cloud Storage, and current carrier service alerts posted on public carrier websites. The team enabled the web search tool and found that SOP questions are answered incorrectly 70% of the time, while alert questions are accurate.\n\nWhat is the right architecture?\n\nA. Set <code>allowed_domains</code> to your company's intranet domain so web search returns the SOP documents.\nB. Raise <code>max_uses</code> so Claude performs more searches before answering SOP questions.\nC. Build a retrieval pipeline over the SOP documents and keep the web search tool for the public alert questions.\nD. Paste the Cloud Storage links of the SOPs into the system prompt so Claude can search them directly.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: web search runs against the public web on Anthropic's side and cannot see private documents in your bucket, so no configuration of the tool will surface SOP content. Retrieval over your own documents (chunk, index, retrieve into the prompt) is the mechanism for private data, while web search remains the right tool for current public information. Option A restricts search to a domain the search engine cannot index. Option B spends more searches on an index that lacks the data. Option D: web search cannot fetch private bucket objects, and the links are not searchable content.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool\">Web search tool</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/embeddings\">Embeddings guidance</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "search-web-search-vs-rag-private-data",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your media company's fact-checking assistant uses the web search tool on Vertex AI. In a review of 200 answers, 35% cited content-farm blogs, while your editorial policy allows only 12 named news and reference publishers. The system prompt already says 'use only reputable sources'.\n\nWhat is the most reliable fix?\n\nA. Add an <code>allowed_domains</code> list with the 12 approved publisher domains to the web search tool definition.\nB. Strengthen the system prompt with the 12 domain names and an instruction to ignore all other sites.\nC. Add both an <code>allowed_domains</code> list of the 12 publishers and a <code>blocked_domains</code> list of known content farms.\nD. Filter the returned citations client-side and drop any statement whose source is not on the approved list.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: <code>allowed_domains</code> is enforced by the search service itself, so results are constrained to the listed domains before Claude ever reads them; domains are given as bare hostnames without a scheme. Option B is prompt-only guidance that the 35% failure rate already shows to be insufficient. Option C is rejected by the API: a request may include <code>allowed_domains</code> or <code>blocked_domains</code>, not both. Option D discards content after Claude has already reasoned over it, producing gaps in answers rather than better sourcing.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool\">Web search tool</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "search-allowed-domains-filtering",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A retail analytics team uses the web search tool on Vertex AI to check competitor prices. Traces show that 15% of requests perform 12 or more searches in a single turn, driving p95 latency to 40 seconds and most of the request cost, while answers stop improving after the third search. Each search already returns several results.\n\nWhat change most directly bounds the work per request?\n\nA. Add a system prompt instruction telling Claude to search at most three times per request.\nB. Set <code>max_uses: 3</code> on the web search tool definition so the service stops further searches in that request.\nC. Lower <code>max_tokens</code> so that long multi-search turns are cut off sooner.\nD. Set a 10-second client timeout and cancel any request that runs longer than that.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: <code>max_uses</code> is enforced server-side. Once the limit is reached, further search attempts return a <code>max_uses_exceeded</code> error inside the tool result and Claude answers with what it has, so latency and cost are bounded deterministically. Option A is prompt-only and not guaranteed. Option C limits output tokens, not the number of searches, and would truncate answers. Option D discards partial work and returns nothing for the slowest requests instead of bounding them.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool\">Web search tool</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "search-max-uses-cap",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your logistics assistant answers questions about carrier service disruptions using the web search tool on Vertex AI. Users say they cannot tell which statements come from real sources; the UI currently concatenates every <code>text</code> block into one paragraph and ignores the other blocks in the response.\n\nWhich TWO changes give users verifiable sourcing? (Select TWO.)\n\nA. Ask Claude in the system prompt to end every answer with a list of the URLs it used.\nB. Render each <code>text</code> block's <code>citations</code> entries (<code>url</code>, <code>title</code>, <code>cited_text</code>) next to the sentence they support.\nC. List the sources from the <code>web_search_tool_result</code> block (title and URL of each <code>web_search_result</code>) alongside the answer.\nD. Set <code>max_uses</code> to 1 so each answer draws on a single search that can be shown as the source.",
+    "Back": "<b>Correct Answer: B and C.</b> Options B and C are correct. A web search response is a sequence of blocks: <code>server_tool_use</code> (the query), <code>web_search_tool_result</code> holding <code>web_search_result</code> entries with title and URL, and <code>text</code> blocks, some carrying <code>citations</code> with the source URL, title, and cited text; rendering the citations beside the statements they support and listing the retrieved sources is how the course recommends surfacing provenance. Option A relies on Claude recalling URLs in prose, which is unverifiable and can be wrong. Option D degrades answer quality and still does not tie any statement to a source.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool\">Web search tool</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/citations\">Citations</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-5",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "search-citations-rendering-provenance",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your retail analytics team is migrating an assistant with 11 custom tools from the Claude API to Claude on Vertex AI. A developer proposes rewriting every tool as a Gemini-style function declaration because 'Vertex has its own tool format', which would take about two weeks.\n\nWhat should the team do?\n\nA. Rewrite the tools as Gemini function declarations, since Vertex routes all tool calls through its own function-calling layer.\nB. Keep the existing <code>tools</code> definitions (name, description, <code>input_schema</code>) unchanged; on Vertex only the request envelope differs.\nC. Register each tool in Model Garden so that Vertex can validate calls against the schemas before they reach the model.\nD. Convert the schemas to OpenAPI documents and reference them from the system prompt instead of the <code>tools</code> parameter.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: Claude on Vertex AI uses the Messages API format; the only differences are that the model is in the URL and <code>anthropic_version</code> is in the body, so the same JSON Schema tool definitions, <code>tool_use</code> blocks, and <code>tool_result</code> handling work unchanged. Option A adopts Gemini's format, which Claude publisher models do not use. Option C: Model Garden enables models; it has no tool registry. Option D moves the schemas out of the <code>tools</code> parameter, where Claude expects them.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai\">Claude on Vertex AI</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools\">Define tools (schemas, descriptions)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview\">Tool use overview</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "tool-schema-parity-vertex",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "To cut request rounds, your logistics team adds the course-style batch tool, whose <code>invocations</code> input is a list of tool names and arguments. In testing, Claude calls the batch tool, but the handler raises an unknown-tool error, and a colleague proposes deleting the individual tool schemas 'so Claude has to use the batch tool'.\n\nWhich TWO steps are needed for the batch tool to work? (Select TWO.)\n\nA. Delete the individual tool schemas from <code>tools</code> so that Claude is forced to route every call through the batch tool instead.\nB. Keep the individual tool schemas in <code>tools</code> next to the batch tool schema, since Claude fills each invocation's arguments from them.\nC. Return a separate <code>tool_result</code> block for every invocation in the list, each one reusing the batch call's <code>tool_use_id</code>.\nD. Add a handler branch that runs each invocation through the existing dispatcher and returns the combined output as one result.",
+    "Back": "<b>Correct Answer: B and D.</b> Options B and D are correct. The batch tool is an ordinary developer-defined tool: you supply its schema and its implementation, and it is an abstraction over the other tools, which stay in the tool list so Claude knows their parameters when it writes invocations. Its handler loops over the invocations, calls each named tool through the same dispatcher used for direct calls, and returns the combined outputs as the one result of the batch <code>tool_use</code>. Option A removes the schemas Claude needs to build invocations. Option C mismatches results to requests: the batch call is a single <code>tool_use</code> and expects exactly one <code>tool_result</code>.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/parallel-tool-use\">Parallel tool use</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls\">Handle tool calls</a>\n&bull; <a href=\"https://github.com/anthropics/courses\">anthropics/courses (GitHub)</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-3",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "tool-batch-tool-wiring",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your media company wants Claude to fix configuration files in a workspace mounted on a Cloud Run worker. The team adds the text editor tool stub (<code>type</code> and <code>name</code> only) to <code>tools</code> on Vertex AI. Claude responds with <code>tool_use</code> blocks such as <code>view</code> and <code>str_replace</code>, but no file ever changes and the loop stalls.\n\nWhat is missing?\n\nA. A full <code>input_schema</code> for the tool listing every command, so Claude can produce complete arguments.\nB. A larger <code>max_tokens</code>, since the edit commands are being cut off before they complete.\nC. A handler in your code that executes each editor command against the workspace and returns the outcome as a <code>tool_result</code>.\nD. The file contents in the system prompt, since the tool can only edit text that is already in context.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: only the text editor tool's schema is built into Claude. The stub expands server-side into the full schema, but the implementation is yours: your code must handle <code>view</code>, <code>create</code>, <code>str_replace</code>, and the other commands against the file system and return results, just as with any custom tool. Option A duplicates a schema Claude already has. Option B: the commands are complete; nothing acts on them. Option D misunderstands the tool, which reads files through your <code>view</code> handler.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool\">Text editor tool</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls\">Handle tool calls</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "tool-text-editor-handler-required",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A logistics team's file-editing agent on Vertex AI has run for months with a text editor tool stub whose <code>type</code> string carries a date. After upgrading to a newer Claude model version, every request fails with an error that the tool type is not supported by the model, before any edit is attempted.\n\nWhat is the correct fix?\n\nA. Add an explicit <code>input_schema</code> to the stub so that the model can validate the tool definition.\nB. Remove the <code>name</code> field, since newer models infer it from the <code>type</code> string.\nC. Downgrade the <code>anthropic_version</code> body field to match the older tool definition.\nD. Update the stub's <code>type</code> string to the text editor version that corresponds to the new model.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: the text editor stub's <code>type</code> encodes a versioned schema, and the version a model accepts depends on the model; the course's helper returns a different dated type string per model family for exactly this reason. Option A: the stub is expanded server-side and takes no <code>input_schema</code>. Option B: the <code>name</code> is required. Option C: <code>anthropic_version</code> is the fixed Vertex API version and is unrelated to tool versions.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool\">Text editor tool</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai\">Claude on Vertex AI</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "tool-text-editor-type-per-model",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your retail assistant's tool loop on Vertex AI sends <code>tools</code> on the first request only. When Claude requests <code>lookup_inventory</code>, your code runs it, appends the assistant turn and a <code>tool_result</code> message, and calls the API again without <code>tools</code>. That second call fails with a 400 error about tool blocks in the conversation.\n\nWhat is the fix?\n\nA. Include the same <code>tools</code> list on every request in the loop, including the ones that return tool results.\nB. Remove the <code>tool_use</code> and <code>tool_result</code> blocks from history and send the tool output as plain text.\nC. Send the tool result in an assistant message instead of a user message on the follow-up call.\nD. Start a fresh conversation for the follow-up request and include only the tool output.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: once tools are introduced, every request in the conversation must carry the tool definitions, including follow-up requests that deliver <code>tool_result</code> blocks; the API rejects <code>tool_use</code> and <code>tool_result</code> content when <code>tools</code> is absent. Option B destroys the structured pairing Claude uses to relate results to requests. Option C: tool results are sent in a user message. Option D discards the conversation context that the tool call was serving.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works\">How tool use works</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls\">Handle tool calls</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/troubleshooting-tool-use\">Troubleshooting tool use</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "tool-tools-param-on-followup-requests",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your logistics assistant on Vertex AI combines three custom tools with the web search tool. The tool loop treats every non-text block as a tool request: when a response contains a <code>server_tool_use</code> block for <code>web_search</code>, the handler looks it up in the dispatcher, fails, and sends back an error <code>tool_result</code> for it, and the next request fails validation.\n\nHow should the loop handle these blocks?\n\nA. Add a <code>web_search</code> entry to the dispatcher that calls a third-party search API and returns its results in a <code>tool_result</code> block.\nB. Strip <code>server_tool_use</code> blocks from the assistant message before storing it in the conversation history.\nC. Disable the web search tool whenever custom tools are present, since the two cannot be combined in one request.\nD. Execute only <code>tool_use</code> blocks; <code>server_tool_use</code> and <code>web_search_tool_result</code> blocks are completed server-side and need no result from you.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: web search is a server tool. Anthropic runs the search and the response already contains the <code>web_search_tool_result</code>, so the client loop must not execute or answer it; only <code>tool_use</code> blocks for your custom tools require a <code>tool_result</code>. Option A duplicates a search that already happened and sends a result for an ID that expects none. Option B alters assistant content that must be passed back unchanged in later turns. Option C is unnecessary; server and client tools can coexist in one request.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool\">Web search tool</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls\">Handle tool calls</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "tool-server-tool-blocks-not-executed",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A logistics team wants Claude to apply small changes to 3,000-line YAML routing configurations from a Cloud Run job. The current design asks Claude to output the entire rewritten file, which costs about 40,000 output tokens per change and has introduced unrelated line drift in 8% of edits.\n\nWhich approach best fits this task?\n\nA. Keep full-file rewrites but add a diff check that rejects any output that changes more than the intended lines.\nB. Split the file into 500-line pieces and have Claude rewrite only the piece that contains the change.\nC. Provide the text editor tool with a handler so Claude views the file and applies <code>str_replace</code> edits to only the affected lines.\nD. Enable extended thinking so that Claude reproduces the untouched lines more faithfully.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: the text editor tool exists for programmatic file manipulation. Claude inspects the file with <code>view</code> and changes only the relevant text with <code>str_replace</code>, so output tokens scale with the edit rather than the file and untouched lines are never regenerated. Option A detects drift only after paying for the full rewrite. Option B still regenerates hundreds of lines per change and adds bookkeeping. Option D spends more tokens hoping a generative rewrite becomes exact, which no reasoning budget guarantees.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool\">Text editor tool</a>\n&bull; <a href=\"https://www.anthropic.com/engineering/writing-tools-for-agents\">Writing tools for agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "tool-text-editor-targeted-edits",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your retail analytics team scores product listings with a parallelization workflow on Vertex AI: six focused calls (title, images, pricing, compliance, description, shipping) run at once and an aggregator call produces the final score. After a prompt edit, the compliance dimension's accuracy fell from 94% to 81%, while the other dimensions were unchanged.\n\nWhat is the most efficient way to diagnose and fix the regression?\n\nA. Re-run the end-to-end eval on aggregated scores after each candidate fix to the aggregator prompt.\nB. Evaluate the compliance subtask prompt in isolation against its own labeled cases and iterate on that prompt alone.\nC. Merge the six prompts back into a single call so there is only one prompt to test.\nD. Add extended thinking to all six subtask calls to recover accuracy across the board.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: a key benefit of parallelization is that each subtask has its own prompt that can be evaluated and improved independently, so the regression can be isolated to the compliance prompt and fixed without touching the others. Option A tests the wrong component and mixes the signal with aggregation. Option C gives up the focus and independent testability that motivated the design. Option D adds cost and latency to five healthy dimensions to fix one.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "flow-parallel-subtask-independent-eval",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A media company's pipeline on Vertex AI must, for each topic: pick the most promising angle from trending data, research that angle, and then write a 60-second script from the research. A developer proposes running the three Claude calls in parallel to cut latency from 24 seconds to about 9.\n\nWhy will this not work, and what structure fits?\n\nA. The steps depend on each other's output, so they must be chained in order; parallelization fits only independent subtasks.\nB. Parallel calls share one conversation, so the three prompts would interfere; use separate system prompts instead.\nC. Three calls exceed the parallel limit for a single request; batch them into a single tool call instead.\nD. The steps are dependent, so a single combined prompt that does all three is the only way to preserve their ordering.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: parallelization splits a task into subtasks that can run simultaneously because they are independent. Here research needs the chosen angle and the script needs the research, so the work is a chain in which each call feeds the next. Option B misdescribes parallel calls, which are separate requests. Option C invents a limit. Option D preserves order but collapses focused steps into one overloaded prompt, which chaining exists to avoid.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/chain-prompts\">Chain complex prompts</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "flow-parallel-vs-chain-dependent-steps",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your logistics team currently checks each shipment exception with a sequential chain of five focused Claude calls on Vertex AI, averaging 2 seconds each. Finance asks whether converting the chain into a five-way parallel fan-out with an aggregator call will lower monthly spend.\n\nWhat should you tell them?\n\nA. Both cost and latency fall roughly fivefold, because the five parallel calls share a single processed context.\nB. Cost drops because the aggregator replaces the five calls, while latency is unchanged.\nC. Latency falls to about one call plus the aggregator, while cost stays similar or slightly higher due to the extra aggregator call.\nD. Neither changes materially; parallelization only improves accuracy by keeping each prompt focused on one subtask.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: fan-out runs the five subtasks simultaneously, so wall-clock time approaches the slowest single call plus the aggregator, but every subtask is still a separate billed call and the aggregator adds one more, so token cost is similar to the chain or slightly higher. Option A: parallel requests do not share processing. Option B: the aggregator consumes the subtask outputs; it does not replace them. Option D ignores the latency gain that is the main reason to fan out.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "flow-fanout-cost-latency-profile",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your logistics assistant on Vertex AI uses a routing workflow: a classification call assigns each request to one of six pipelines, each with its own prompt and tools. After a change, the end-to-end eval fell from 91% to 78%, with failures spread across several pipelines whose prompts were not modified.\n\nWhere should you look first?\n\nA. Evaluate the routing call by itself on labeled requests, since one misroute sends a request down an entirely wrong pipeline.\nB. Add extended thinking to all six pipeline prompts to make them more robust to unusual inputs.\nC. Have the router emit a confidence score and send low-confidence requests to a larger model.\nD. Merge the six pipelines into one prompt so that a routing error can no longer occur.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: in a routing workflow a single classification decides the entire downstream path, so a router regression shows up as failures scattered across otherwise unchanged pipelines, and because the steps are known the router can be evaluated in isolation against labeled inputs. Option B treats symptoms in components that did not change. Option C relies on self-reported confidence, which is not a reliable signal, and adds cost without finding the fault. Option D discards the specialization that routing provides.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "flow-routing-evaluate-router-in-isolation",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your logistics routing workflow classifies requests into six categories, each with a specialized prompt and tool set. In the last month, 9% of requests concern customs paperwork, which fits none of the categories; the router assigns them to 'tracking', whose pipeline lacks the tools to help, and users receive irrelevant answers.\n\nWhat is the right change?\n\nA. Give every pipeline access to all tools so that any misrouted request can still be completed.\nB. Instruct the tracking pipeline to detect customs questions and answer them from general knowledge.\nC. Have the router return two candidate categories and run both pipelines, keeping the better answer.\nD. Add a 'customs' category to the router and build a pipeline with a prompt and tools specialized for it.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: routing works by mapping inputs to predefined categories with a dedicated downstream pipeline for each, so a recurring request type with no category is a gap in the category set, and the fix is to add the category and its specialized pipeline. Option A undoes the separation of tools that makes each pipeline reliable. Option B stretches a pipeline beyond its purpose without the needed tools. Option C doubles cost and latency for every request to paper over a missing route.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "flow-routing-add-missing-category",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your logistics operations agent on Vertex AI plans its own tool calls for every request and completes 88% of them. Log analysis shows that three request types (reschedule delivery, update address, resend label) make up 80% of traffic and always require the same three tool calls in the same order.\n\nWhat change most improves reliability?\n\nA. Cap the agent at eight tool calls per request and return an error when the cap is reached.\nB. Move to a larger model with extended thinking so the agent plans the common requests more reliably.\nC. Implement the three common request types as fixed workflows and keep the agent for the long tail of unusual requests.\nD. Add more specialized tools so the agent has a dedicated tool for each of the three request types.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: when the exact steps are known in advance, a workflow is more accurate, easier to test, and more reliable than an agent; the course's recommendation is to prefer workflows wherever possible and reserve agents for genuinely open-ended requests. Option A uses an iteration cap as a control, which does not make the common paths succeed. Option B raises cost for a planning problem that does not need planning. Option D adds specialized tools, contrary to keeping agent tools general, and still depends on the agent's planning.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "flow-carve-fixed-paths-into-workflows",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A media company's video agent on Vertex AI generates short clips with a bash tool that runs FFmpeg on a Compute Engine worker. FFmpeg exits with code 0 on every run, yet 15% of published clips have narration that starts several seconds late, and the agent reports success each time.\n\nWhich change best lets the agent catch these defects before publishing?\n\nA. Instruct the agent to inspect each render with its bash tool, extracting frames at intervals and timestamped captions, and check the narration timing.\nB. Build a dedicated <code>verify_video</code> tool that returns pass or fail from a fixed heuristic applied to the audio waveform.\nC. Ask the agent to report a confidence score after each render and re-render whenever the score is below 0.8.\nD. Re-render every clip twice and publish the second one, since the first attempt is the most error-prone.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: a tool's return value (exit code 0) says the command ran, not that the result is right, so the agent needs a way to inspect its environment after acting. The course's approach is to guide the agent, through the system prompt, to use its general tools to examine the artifact, such as extracting screenshots with FFmpeg and caption timestamps with Whisper, so it can judge the result and redo the work. Option B hard-codes a heuristic for a judgment that varies per clip. Option C relies on self-reported confidence. Option D re-renders without any check of the result.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "flow-environment-inspection-via-general-tools",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your retail returns agent on Vertex AI has <code>get_current_datetime</code>, <code>add_duration</code>, and <code>lookup_order</code> tools. When a customer asks 'when does my 30-day return window close?' without an order number, the agent assumes the purchase was today in 40% of cases and states a wrong date.\n\nWhat design change best addresses this?\n\nA. Default the purchase date to today inside <code>add_duration</code> so the return-window calculation always completes.\nB. Let the agent ask the customer for the order number or purchase date before calculating, relaying that question as the turn's response.\nC. Add a pre-parser that extracts dates from the message before Claude is called and rejects any message that lacks one.\nD. Limit the agent to two tool calls per request so that it cannot compound the error.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: an agent can recognize that a tool call needs information it does not have and ask the user for it, as in the course's warranty example, and designing the loop so a clarifying question is a valid turn outcome removes the incentive to guess. Option A bakes the wrong assumption into the tool. Option C is a brittle pre-parser that rejects legitimate requests instead of asking. Option D limits tool calls without addressing the missing input.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works\">How tool use works</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "flow-agent-asks-for-missing-input",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A retail analytics team is building semantic search over 50,000 product descriptions on Vertex AI. Their pipeline asks Claude Sonnet in a prompt to 'return a 768-dimensional embedding vector for this text' and stores the numbers it prints. Nearest-neighbor results are effectively random.\n\nWhat should the pipeline use instead?\n\nA. Claude with extended thinking enabled so that the vectors it prints are computed more carefully.\nB. Claude Opus instead of Sonnet, since higher intelligence yields more accurate vectors.\nC. BM25 term matching only, since language models cannot support semantic similarity.\nD. A dedicated Vertex AI embedding model such as <code>text-embedding-005</code>, applied to both the chunks and each query.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: Claude generates text, not embeddings, so a vector it writes out is just plausible-looking text. Vertex AI offers dedicated embedding models, accessed through the Google GenAI SDK, and the same model must embed both the stored chunks and each incoming query so their vectors are comparable. Options A and B still ask a text model to fabricate numbers. Option C gives up semantic matching entirely when a proper embedding model is available.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/embeddings\">Embeddings guidance</a>\n&bull; <a href=\"https://github.com/anthropics/courses\">anthropics/courses (GitHub)</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "rag-embeddings-dedicated-vertex-model",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your logistics team's RAG pipeline over shipping SOPs uses size-based chunking with a chunk length of 150 characters and an overlap of 20. The top three retrieved chunks together hold under 450 characters, and in 60% of answers Claude says the context does not contain the procedure even when the correct chunk is among them.\n\nWhat is the most appropriate first adjustment?\n\nA. Retrieve the top 25 chunks instead of the top three so that more of the document reaches the prompt.\nB. Increase the chunk length to several hundred characters (for example 500 with overlap 150) so each chunk carries a complete idea.\nC. Switch to a model with a larger context window so that it can reason over the fragments.\nD. Enable extended thinking so that Claude can reconstruct procedures from the fragments.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: at 150 characters each chunk is a sentence fragment that cannot answer anything on its own, and the course's own experiment shows that raising the size (with overlap) produces chunks that read as meaningful sections. Option A floods the prompt with many fragments, raising cost and noise without making any single chunk complete. Options C and D try to compensate for missing context with more model capacity, which cannot restore text that was never retrieved.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://github.com/anthropics/courses\">anthropics/courses (GitHub)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/long-context-tips\">Long context tips</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "rag-chunk-size-too-small",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A media company's knowledge base ingests its own markdown articles, which chunk cleanly on second-level headings, and now also accepts user-uploaded PDFs converted to plain text. For 30% of the PDFs, the header-based chunker returns a single chunk of 40,000 characters, and retrieval for those documents fails.\n\nWhat is the right chunking design?\n\nA. Keep header-based chunking for markdown and fall back to size-based chunking with overlap for documents without a guaranteed structure.\nB. Require users to convert PDFs to markdown with headings before upload so the header chunker always works.\nC. Apply semantic chunking with an NLP model to every document so that structure is never needed.\nD. Loosen the header pattern to a single <code>#</code> so that more boundaries are found in the PDF text.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: structure-based chunking depends on guarantees about the input format, and when those guarantees do not hold the course's guidance is to fall back to the reliable default, size-based chunking by character with overlap, while keeping the structural chunker for documents that qualify. Option B pushes the problem onto users and still fails for any unconverted file. Option C adds a complex technique when a simpler fallback resolves the failure. Option D changes a pattern that plain PDF text simply does not contain.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://github.com/anthropics/courses\">anthropics/courses (GitHub)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/long-context-tips\">Long context tips</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "rag-structure-chunking-fallback",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your retail search pipeline uses a retriever that forwards each query to a vector index and a BM25 index, both exposing <code>add_document</code> and <code>search</code>, and merges their ranked results. Product managers now want exact SKU matches (for example 'SKU-48213') to surface reliably, and an engineer proposes a regex pre-parser that bypasses the retriever for SKU-shaped queries.\n\nWhich design best fits the existing pipeline?\n\nA. Add the regex pre-parser in front of the retriever and return the SKU record directly whenever the pattern matches.\nB. Replace the BM25 index with the SKU lookup, since both of them handle exact terms.\nC. Implement SKU lookup as a third index with the same <code>add_document</code> and <code>search</code> interface and register it with the retriever.\nD. Ask Claude in the answer prompt to recognize SKUs and request the matching record with a tool.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: the multi-index retriever is designed for extension. Any search method that implements the shared interface can be added, and its results are merged with the others, so SKU lookups rank alongside semantic and lexical hits without special-casing queries. Option A introduces a brittle routing layer that skips the retriever and misses queries mixing a SKU with other text. Option B loses lexical matching for everything that is not a SKU. Option D moves retrieval into the generation step, adding latency and unreliability.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://github.com/anthropics/courses\">anthropics/courses (GitHub)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/embeddings\">Embeddings guidance</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "rag-multi-index-add-new-index",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your retail analytics team enables extended thinking on Vertex AI with <code>budget_tokens: 8000</code> for a demand-forecast explanation task and sets <code>max_tokens: 8192</code>. In production, 30% of responses contain a thinking block but the visible answer is empty or cut off after a sentence.\n\nWhat is the cause and the fix?\n\nA. The budget is too small for the task; raise <code>budget_tokens</code> to 16000 while keeping <code>max_tokens</code> at 8192.\nB. The model lacks a signal for when to end thinking; add a stop sequence so that it moves on to the answer.\nC. Extended thinking on Vertex AI requires streaming; enable streaming so that the answer is delivered in full.\nD. Thinking tokens count against <code>max_tokens</code>, leaving almost nothing for the answer; set <code>max_tokens</code> well above the budget, such as 16000.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: <code>max_tokens</code> bounds thinking and answer together, so it must exceed <code>budget_tokens</code> by a comfortable margin; with an 8,000 budget and an 8,192 cap, the answer can be at most 192 tokens whenever the model uses its full budget, which is why only some responses are cut off. Option A sets a budget larger than the cap, which the API rejects because <code>budget_tokens</code> must be less than <code>max_tokens</code>, and it targets the wrong quantity anyway. Option B: thinking ends on its own within the budget, and stop sequences apply to generated output text. Option C: streaming changes delivery, not the token budget.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/extended-thinking\">Extended thinking</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>"
+   },
+   "tags": [
+    "domain::d4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "feat-thinking-max-tokens-exceeds-budget",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A logistics assistant on Vertex AI uses extended thinking in multi-turn conversations. To save space, the app trims whitespace and truncates the <code>thinking</code> text of earlier assistant turns to 500 characters before resending history. Since this change, follow-up requests fail with a signature validation error.\n\nWhat must the history code do?\n\nA. Pass <code>thinking</code> and <code>redacted_thinking</code> blocks back exactly as received, signatures included, with no edits.\nB. Recompute each block's signature locally over the truncated text with your own key before resending the history.\nC. Convert earlier <code>thinking</code> blocks to ordinary <code>text</code> blocks so that no signature is checked on them when resent.\nD. Increase <code>budget_tokens</code> so that the thinking text is short enough to keep intact.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: each thinking block carries a cryptographic signature that Claude verifies when the block is sent back, and any modification, including trimming or truncation, invalidates it. The same applies to <code>redacted_thinking</code> blocks, whose encrypted content preserves context and must be returned unchanged. Option B is impossible; only the API can sign. Option C changes the block type and loses the reasoning context. Option D does not affect the integrity check.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/extended-thinking\">Extended thinking</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/working-with-messages\">Working with messages</a>"
+   },
+   "tags": [
+    "domain::d4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "feat-thinking-blocks-unmodified-in-history",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your media company's pipeline on Vertex AI must extract figures and tables from 20-page PDF reports stored in Cloud Storage. A developer first passes the object's Cloud Storage URI as a document <code>url</code> source and then tries the Files API, and both are rejected on Vertex.\n\nWhat is the correct way to provide the PDFs?\n\nA. Convert each PDF to plain text with an OCR job first and send the text, since Vertex accepts text only.\nB. Read the bytes from Cloud Storage and send them as a base64 <code>document</code> block with media type <code>application/pdf</code>.\nC. Make the object publicly readable and pass its public web address as the document source.\nD. Send the PDF through a custom tool result so that the model receives it after a tool call.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: PDF input is supported on Vertex AI, but URL sources and the Files API are not, so the supported path is to load the file bytes and send a <code>document</code> content block with base64 data and the <code>application/pdf</code> media type, the same shape the course uses for images with the type and media type changed. Option A discards charts and tables that Claude can read directly. Option C is still a URL source, which Vertex does not accept, and it exposes the report. Option D: documents are provided as content blocks, not through tool results.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/pdf-support\">PDF support</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai\">Claude on Vertex AI</a>"
+   },
+   "tags": [
+    "domain::d4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "feat-pdf-base64-document-on-vertex",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your media company's research assistant on Vertex AI answers questions about 40-page PDF reports. Editors require every claim to link to the page it came from. The current pipeline extracts the PDF to plain text before the request, and the citations it gets back carry only character offsets, so the UI cannot show page numbers.\n\nWhat change produces page-level citations?\n\nA. Keep the text extraction and instruct Claude to append the page number to every sentence it cites from the report.\nB. Insert 'Page N' markers into the extracted text every 3,000 characters and map character offsets back to those markers.\nC. Send the original PDF as a <code>document</code> block with <code>citations</code> enabled so citations return page locations with start and end pages.\nD. Send the PDF as one image per page so that citations reference image indexes instead of character offsets.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: the citation location type follows the source type. Plain-text documents yield character-location citations, while PDF documents yield page-location citations with start and end page numbers, plus the cited text and document title. Option A asks Claude to guess page numbers with no grounding. Option B approximates pages by character count, which breaks on tables and figures. Option D: images do not produce citations.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/citations\">Citations</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/pdf-support\">PDF support</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "feat-citations-page-location-from-pdf",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your logistics assistant on Vertex AI enables prompt caching with a breakpoint at the end of a 7,900-token system prompt. Usage data shows <code>cache_creation_input_tokens</code> of about 7,900 on every request and <code>cache_read_input_tokens</code> of 0, even for requests seconds apart. The system prompt begins with 'Current time:' and a timestamp, followed by the static instructions.\n\nWhy is the cache never read, and what fixes it?\n\nA. Caching requires at least 8,192 tokens of content; pad the system prompt until it crosses that threshold.\nB. The cached prefix must be identical across requests; move the timestamp out of it, for example into the user message after the breakpoint.\nC. Each request creates its own cache; enable caching on the user message instead of the system prompt.\nD. The cache lifetime on Vertex AI is under a second; batch requests so that they arrive at the same moment.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: a cache hit requires the content up to the breakpoint to be identical to the earlier request, and a per-request timestamp at the start of the system prompt changes the prefix every time, so every request writes a new cache and none reads one. Moving volatile content after the breakpoint keeps the static prefix reusable. Option A: the minimum cacheable length is between 1,024 and 4,096 tokens depending on the model, which 7,900 tokens already exceeds. Option C moves the breakpoint to the least stable content. Option D: cached content persists for minutes, not sub-second.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-caching\">Prompt caching</a>"
+   },
+   "tags": [
+    "domain::d4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "feat-caching-prefix-must-be-identical",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your retail analytics app on Vertex AI generates JSON pricing rules that users copy with one click. The user prompt already says 'Respond with only the JSON', yet 15% of responses still arrive wrapped in a markdown code fence with a sentence of explanation before or after it, which breaks the copy button.\n\nWhat is the most reliable way to get only the JSON?\n\nA. Add a second, stronger instruction in the system prompt forbidding any commentary or markdown fences.\nB. Strip everything before the first <code>{</code> and after the last <code>}</code> in code before the result is shown to the user.\nC. Lower <code>temperature</code> to 0 so that the model stops adding explanations around the JSON.\nD. Prefill the assistant turn with the opening fence (three backticks plus <code>json</code>) and set the closing fence as a stop sequence.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: prefilling makes Claude treat the opening fence as text it already wrote, so it proceeds straight into the JSON, and the closing-fence stop sequence ends generation before any trailing commentary; the stop sequence itself is not included in the output, leaving raw JSON. Option A is more of the prompt-only instruction that already fails 15% of the time. Option B is fragile when the commentary itself contains braces. Option C affects randomness, not the habit of explaining.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prefill-claudes-response\">Prefill Claude's response</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>\n&bull; <a href=\"https://github.com/anthropics/courses\">anthropics/courses (GitHub)</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "output-prefill-stop-raw-json",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are reproducing the course's structured-data exercise on Vertex AI: the prompt asks for three sample CLI commands, and you may change only the assistant prefill and the stop sequences. With a prefill of just three backticks and a stop sequence of three backticks, the output starts with the word <code>bash</code> on its own line, sometimes contains only one command, and includes shell comments.\n\nWhich TWO settings produce all three commands in one block with no comments? (Select TWO.)\n\nA. Prefill with a guiding sentence ('Here are all three commands in a single block without comments:'), a newline, and the opening fence with the <code>bash</code> tag.\nB. Keep the prefill as three backticks alone so that Claude selects the appropriate language identifier for the block itself.\nC. Use a newline as the stop sequence so that each command is returned to the caller as soon as it is complete.\nD. Keep the closing fence (three backticks) as the stop sequence so that generation ends when the block closes.",
+    "Back": "<b>Correct Answer: A and D.</b> Options A and D are correct. The <code>bash</code> line appears because Claude continues a bare fence with a language identifier; including <code>bash</code> in the prefill removes it, and a prefilled sentence steers Claude to put all three commands in one block without comments, since a prefill can carry any text, not only delimiters. The closing-fence stop sequence still terminates generation at the end of the block. Option B is the configuration that produced the problem. Option C stops after the first line, losing the other commands.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prefill-claudes-response\">Prefill Claude's response</a>\n&bull; <a href=\"https://github.com/anthropics/courses\">anthropics/courses (GitHub)</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-3",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "output-exercise-bash-prefill-guidance",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your media pipeline on Vertex AI prefills the assistant turn with the opening of a fenced code block and sets the closing fence as a stop sequence. The post-processor then searches the response for the closing fence to cut the block out and raises an error on 100% of responses.\n\nWhat explains this?\n\nA. The stop sequence text is not included in the returned response; treat the block as ending where the response ends.\nB. Stop sequences are ignored when a prefill is present; remove the prefill so that the fence is emitted.\nC. The closing fence is returned with a trailing newline that the search does not match; trim the whitespace first.\nD. The model emits the closing fence only when <code>max_tokens</code> is large enough; raise the limit.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: when Claude generates a stop sequence, generation halts and the matched text is excluded from the returned content, so the closing fence never appears and the response simply ends at the end of the block. Option B: prefill and stop sequences are designed to be combined. Option C: nothing at or after the stop sequence is returned at all. Option D: <code>max_tokens</code> has no bearing on stop-sequence exclusion.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prefill-claudes-response\">Prefill Claude's response</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "output-stop-sequence-excluded-from-response",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A logistics report service on Vertex AI prefills the assistant turn with <code>{\"shipment_id\":</code> to force JSON output, then calls <code>json.loads</code> on <code>message.content[0].text</code>. Every call fails with a parse error at position 0, although the printed text looks like the rest of a valid object.\n\nWhat is the fix?\n\nA. Move the prefill into the user message as an instruction so that the model repeats it verbatim in its answer.\nB. Set a stop sequence of <code>}</code> so that the model closes the object it started and returns a complete value.\nC. Prepend the prefill to the returned text before parsing; the response continues from it and does not repeat it.\nD. Raise <code>max_tokens</code>, since the opening of the object was truncated away from the start of the returned text.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: Claude treats the prefilled content as text it has already written and continues from its end, and the API returns only the newly generated continuation, so you must stitch the prefill and the response together to reconstruct the full object. Option A turns steering text into an instruction with no guarantee. Option B would cut off the object at the first closing brace and still not restore the opening. Option D: nothing was truncated.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prefill-claudes-response\">Prefill Claude's response</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "output-prefill-not-repeated-in-response",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your media company's debate-prep tool on Vertex AI must argue the assigned side of a motion. The system prompt states the side to defend, yet in 20% of runs Claude opens with 'There are strong arguments on both sides' and gives a balanced summary.\n\nWhat is the most direct way to commit the response to the assigned side?\n\nA. Repeat the assigned side three times in the system prompt and add 'Do not be balanced' in capital letters at the end.\nB. Generate two responses and keep the one whose first sentence does not mention both sides.\nC. Set <code>temperature</code> to 0 so that the model stops varying its stance between runs.\nD. Prefill the assistant turn with the opening of the argument ('The case for the motion is stronger because') so Claude continues that stance.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: prefilling puts words in Claude's mouth. It treats the prefilled assistant text as its own and continues consistently with it, which the course demonstrates with 'coffee is better because'. Option A is more prompt-only pressure of the kind that already fails one run in five. Option B doubles cost and still yields balanced output when both runs hedge. Option C makes outputs repeatable, not committed; a hedging response at temperature 0 hedges every time.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prefill-claudes-response\">Prefill Claude's response</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/system-prompts\">System prompts (role prompting)</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "output-prefill-commits-stance",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A logistics operations report generator on Vertex AI asks Claude for a summary followed by an 'Appendix' section. Product wants only the summary in the customer email, but the prompt instruction 'omit the appendix' is ignored in 10% of responses, and cutting the summary with <code>max_tokens</code> truncates it mid-sentence.\n\nWhich change reliably ends the response before the appendix?\n\nA. Lower <code>max_tokens</code> further and accept occasional truncation of the summary.\nB. Set <code>stop_sequences</code> to the appendix heading so that generation halts as soon as it begins.\nC. Add few-shot examples of summaries without appendices to the prompt.\nD. Post-process the full response and delete everything after the appendix heading.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: stop sequences end generation the moment the specified string is produced, so the response contains the complete summary and nothing from the appendix, with the heading itself excluded; this controls length and format by content rather than by a token count. Option A trades one defect for another. Option C is still probabilistic guidance. Option D produces the right text but only after paying the tokens and latency for the appendix.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prefill-claudes-response\">Prefill Claude's response</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-google-vertex",
+    "slug": "output-stop-sequence-at-section-marker",
+    "ordinal": 1
+   },
+   "media": []
+  }
+ ]
+}

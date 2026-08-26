@@ -1,0 +1,1107 @@
+{
+ "schema_version": 1,
+ "deck": "CCAR-F::Claude with the Anthropic API",
+ "default_notetype": "basic",
+ "tags": [
+  "source::claude-with-the-anthropic-api",
+  "ccar-f"
+ ],
+ "media_dir": ".",
+ "cards": [
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are building a customer-support assistant on the Messages API. The persona and escalation policy ('You are Aria, a concise billing specialist...') are currently prepended as the first user message of every conversation. In testing, Claude sometimes treats the persona text as conversational content, replying 'As you mentioned, I should be concise,' and drifts from the role in later turns.\n\nWhere should these instructions be placed?\n\nA. In the top-level <code>system</code> parameter, sent with every request.\nB. In an <code>assistant</code> message inserted at the start of the conversation history.\nC. In a <code>{\"role\": \"system\"}</code> entry placed first in the <code>messages</code> array.\nD. At the end of each user message so the instructions stay in recent context.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: role and behavioral instructions belong in the dedicated top-level <code>system</code> parameter, which keeps them separate from conversational content and applies them on every request. Option B makes Claude treat the persona as its own prior output rather than a standing instruction, so it can be echoed or contradicted. Option C is invalid — the <code>messages</code> array accepts only <code>user</code> and <code>assistant</code> roles; system instructions have their own parameter. Option D mixes instructions into user content, adds token overhead to every turn, and leaves the drift problem in place.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/system-prompts\">System prompts (role prompting)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "basics-system-parameter-placement",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your chat application answers opening questions well, but follow-ups fail: when a user asks 'What about the second option you listed?', Claude replies that it does not know which options are being referenced. This happens in roughly 40% of multi-turn sessions. The server currently sends only the newest user message in each API request.\n\nWhat is the correct fix?\n\nA. Include a <code>conversation_id</code> in each request so the API can retrieve the earlier turns from its own server-side store.\nB. Summarize the earlier turns into the system prompt before sending each new request so context fits compactly.\nC. Maintain the message list in your app and send the entire history — every prior user and assistant turn — on each request.\nD. Raise <code>max_tokens</code> so the model retains more of the conversation between one request and the next.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct because the Messages API is stateless: it stores nothing between requests, so every call must carry the complete history for Claude to have context. Option A relies on server-side memory that does not exist. Option B is a technique for very long conversations, but as the primary fix it is lossy and unnecessary for ordinary chats. Option D misunderstands <code>max_tokens</code>, which caps output length and has nothing to do with conversational memory.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/working-with-messages\">Working with messages</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "basics-stateless-full-history",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your invoice-extraction service sends one request per document. A teammate placed the standing extraction rules ('Extract vendor, total, and date; use ISO 8601 dates') in the first user message and pasted each invoice's full text into the <code>system</code> parameter, reasoning that the document is 'context.' Instruction-following is inconsistent across documents.\n\nHow should the request be restructured?\n\nA. Repeat the extraction rules in both the system parameter and the user message so neither channel misses them.\nB. Put the standing rules in the <code>system</code> parameter and each invoice's text in the user message.\nC. Concatenate the rules and the invoice text into a single user message and omit the system parameter entirely.\nD. Keep the current arrangement but wrap the invoice text in XML tags inside the system parameter.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: the system prompt defines standing behavior — the role and rules that apply to every request — while per-request data belongs in user messages. The teammate inverted the two channels. Option A adds redundancy and tokens without fixing the inversion. Option C can function, but it discards the designed separation, so rules compete with document text for attention. Option D marks boundaries but still keeps variable data in the behavioral channel.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/system-prompts\">System prompts (role prompting)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "basics-system-vs-user-content",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your pipeline classifies contract clauses with one identical prompt per clause. Re-running the same clause through the same prompt yields a different label on about 15% of runs, which breaks your regression tests. Each individual label is plausible; the outputs simply vary from run to run.\n\nWhich change most directly reduces the run-to-run variation?\n\nA. Increase <code>max_tokens</code> so the model has more room to settle on a single answer.\nB. Add richer definitions of each label to the prompt for additional guidance.\nC. Switch to a higher-intelligence model tier, which is less random by default.\nD. Set <code>temperature</code> to 0 so the model selects the highest-probability token instead of sampling.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: <code>temperature</code> controls sampling randomness, and at 0 the model picks the highest-probability token rather than sampling — the recommended setting for classification and extraction that must be consistent. Anthropic notes that results are still not fully deterministic even at 0, so a small residual variance can remain, but this is the lever that most directly targets run-to-run variation. Option A is an output-length cap unrelated to sampling. Option B can help genuinely ambiguous clauses but does not remove sampling randomness on identical input. Option C is wrong because model tier does not govern sampling randomness; temperature does.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/increase-consistency\">Increase output consistency</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "basics-temperature-determinism",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your report-generation service produces multi-page summaries. In 8% of runs the returned text ends mid-sentence, and in every such case the response's <code>stop_reason</code> is <code>max_tokens</code>.\n\nWhat is happening, and what is the appropriate fix?\n\nA. The input exceeded the model's context window; shorten the source documents before retrying.\nB. Generation hit your configured <code>max_tokens</code> cap; raise it or continue the response in a follow-up.\nC. The model judged the summary complete; instruct it in the prompt to always finish its sentences.\nD. A transient service fault truncated the output; add automatic retries with exponential backoff.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: a <code>stop_reason</code> of <code>max_tokens</code> means output generation reached the limit you set. <code>max_tokens</code> is a safety cap, not a target length, so the fix is a larger cap or a continuation request. Option A describes a different condition that this stop reason does not report. Option C would apply to <code>end_turn</code>; prompt wording cannot lift a hard output cap. Option D is wrong because the cap is deterministic — retries reproduce the same truncation.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons\">Handling stop reasons</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "basics-max-tokens-truncation",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A developer new to tool use reports that the assistant 'randomly stops answering': some responses end with a <code>tool_use</code> block, contain no final answer, and have <code>stop_reason</code> set to <code>tool_use</code>. Their code logs these as failures and retries the identical request, which returns the same shape again.\n\nHow should these responses be handled?\n\nA. Treat them as rate-limiting artifacts and retry the same request with exponential backoff.\nB. Extract whatever text blocks exist and display them to the user as the final answer to the question.\nC. Run the requested tool, return its output in a <code>tool_result</code> block, and call the API again.\nD. Set <code>tool_choice</code> to <code>none</code> so every response arrives as finished text with no tool blocks.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: <code>stop_reason: tool_use</code> means Claude has paused its turn to request a tool invocation. That is normal operation, not a failure — your code runs the tool, returns the result, and Claude finishes. Option A misreads protocol as infrastructure flakiness; retrying reproduces the request deliberately. Option B surfaces preamble text as if it were the answer. Option D removes tool calling entirely instead of completing the loop.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons\">Handling stop reasons</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works\">How tool use works</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "basics-stop-reason-tool-use",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are implementing the request loop for a support agent that may chain several tool calls per query. One teammate proposes exiting after exactly five iterations because 'no task needs more than five tools'; another proposes exiting when the response text contains the phrase 'Final answer:'.\n\nWhat should be the loop's primary termination condition?\n\nA. The response's <code>stop_reason</code> is no longer <code>tool_use</code>.\nB. A fixed iteration count derived from production percentiles has been reached.\nC. The response text matches a completion phrase mandated by the system prompt.\nD. Every tool defined in the request has been called at least once.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: the API reports why generation stopped, and while <code>stop_reason</code> is <code>tool_use</code> Claude is still requesting tools; any other value means the turn is complete. That is a deterministic, protocol-level signal. Option B is useful only as a safety backstop — as the primary condition it truncates legitimate long chains and pads short ones. Option C depends on probabilistic phrasing that varies and can appear mid-reasoning. Option D is arbitrary, since tasks legitimately use a subset of tools.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons\">Handling stop reasons</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use\">Implement tool use</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "basics-loop-termination-stop-reason",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your extraction agent intermittently receives responses whose final <code>tool_use</code> block contains truncated, unparseable JSON in <code>input</code>. Every affected response has a <code>stop_reason</code> of <code>max_tokens</code>. Failures cluster on invoices with many line items.\n\nWhat is the appropriate handling?\n\nA. Return a <code>tool_result</code> with <code>is_error: true</code> describing the malformed JSON so Claude corrects itself.\nB. Run a JSON-repair pass that closes unterminated brackets before parsing the tool input.\nC. Retry the request with a higher <code>max_tokens</code>, since generation was cut off mid tool call.\nD. Add a system-prompt instruction to emit more compact JSON for large documents.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: <code>max_tokens</code> combined with a trailing <code>tool_use</code> block means the output cap interrupted the call before its arguments were finished; the documented remedy is to retry with a larger budget. Option A misdiagnoses the situation — the model never completed the call, and an error result cannot fix a truncation the same cap will reproduce. Option B silently fabricates structure; repaired JSON may parse yet drop line items. Option D is an unreliable prompt-level workaround for a hard limit.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons\">Handling stop reasons</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/troubleshooting-tool-use\">Troubleshooting tool use</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "basics-truncated-tool-use-max-tokens",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your CI code-review prompt misses real bugs in some pull requests. An engineer collected 3 failing examples, reworded the prompt until those 3 pass, and wants to ship. A similar fix last quarter repaired the demo cases but quietly regressed other checks.\n\nWhat should happen before the rewrite is adopted?\n\nA. Roll it out to 10% of CI jobs and watch developer complaints for a week before deciding whether to keep it.\nB. Establish a baseline by scoring the current prompt on an eval dataset, then compare the rewrite on that dataset.\nC. Ask a stronger model to review both prompt texts and pick the better-written one to adopt.\nD. Ship it, since restoring the three failing cases demonstrates that the rewrite is an improvement overall.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: without a baseline over a representative dataset there is no way to know whether a rewrite helps overall or only on the cherry-picked cases — exactly how last quarter's regression slipped through. Option A is slower and riskier, and it measures complaints rather than accuracy. Option C judges prose quality of the prompts, not the measured behavior of their outputs. Option D is the under-testing trap: three anecdotes are not evidence of net improvement.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/define-success\">Define success criteria</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "eval-baseline-before-changes",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your team wants to evaluate a new invoice-extraction prompt but has no test data. One engineer insists a useful eval needs thousands of hand-labeled production invoices, so evaluation should wait a quarter for enough data to accumulate.\n\nWhat is the most practical way to start?\n\nA. Generate a small set of representative cases with a fast model like Haiku, review them by hand, and grow it over time.\nB. Wait for a quarter of production invoices to accumulate and hand-label them before running any evaluation at all.\nC. Contract a labeling vendor for 10,000 annotated invoices so the first eval run is statistically definitive from day one.\nD. Skip datasets and spot-check a few outputs manually after each prompt change.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: eval datasets can start tiny — even a handful of cases beats none — and can be generated cheaply with a fast model, then human-reviewed and expanded. Option B delays feedback during the phase when iteration is fastest and cheapest. Option C over-invests before the team knows which cases matter. Option D is subjective spot-checking, the very under-testing habit evals are meant to replace.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "eval-dataset-bootstrapping",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your extraction eval sends every output to a model grader that scores 'overall quality 1-10.' Grading costs are high, scores for identical outputs vary between runs, and 30% of all failures are outputs that simply fail <code>json.loads</code>.\n\nHow should grading be restructured?\n\nA. Run the model grader three times per output and average the scores to smooth out run-to-run variance.\nB. Check parseability and required fields in code, and use the model grader only for semantic accuracy.\nC. Upgrade the grader to a higher-intelligence model so its quality scores become reliable across runs.\nD. Lower the passing threshold so run-to-run variance in grader scores stops flipping results.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: code graders are deterministic, fast, and free of API cost, which makes them ideal for mechanically checkable properties like parseability and field presence; model graders earn their cost and variance only where judgment is required. Option A triples cost to average out noise that code checks eliminate outright. Option C raises expense while remaining probabilistic on checks that need no model at all. Option D hides variance instead of removing it and weakens the eval.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "eval-code-vs-model-grading",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your model grader's entire prompt is 'Score this response 1-10.' Across 200 test cases, 84% of scores land on 6, 7, or 8 — including outputs your engineers consider plainly wrong — so competing prompt variants are statistically indistinguishable.\n\nWhich TWO grader changes most improve the score signal? (Select TWO.)\n\nA. State explicit evaluation criteria in the grader prompt — what a high-scoring output must contain.\nB. Expand the scale to 1-100 so the grader can express finer distinctions between similar outputs.\nC. Run three grader calls per output and report the median score to stabilize the result.\nD. Require the grader to identify strengths, weaknesses, and reasoning before emitting its score.",
+    "Back": "<b>Correct Answer: A and D.</b> Option A gives the grader a concrete standard to grade against instead of an unanchored notion of quality. Option D forces analysis before judgment — a bare score request defaults to middling numbers, while reasoning-first grading pushes scores toward the evidence. Option B relabels the same compressed judgment on a wider scale without changing it. Option C aggregates three copies of the same middling distribution; the median of three 7s is still 7.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/chain-of-thought\">Let Claude think (CoT)</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "eval-model-grader-design",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Two engineers have competing rewrites of your support-triage prompt. Each demonstrates superiority on hand-picked examples — version A shines on refund cases, version B on shipping cases — and the disagreement has stalled the release for a week.\n\nHow should the team decide between them?\n\nA. Ask Claude to read both prompt texts and judge which one is better written and more complete.\nB. Merge the strongest-looking sentences of each rewrite into a single hybrid prompt and ship that.\nC. Run both versions on the same eval dataset with the same grader and compare aggregate scores.\nD. Ship version A now, since refund errors cost more, and revisit the shipping cases later.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: a comparison is only meaningful when both variants face identical inputs and identical grading; aggregate scores turn 'better' into a measured claim that covers both case types. Option A evaluates the prose style of prompts, not the behavior of their outputs. Option B combines unmeasured parts and may inherit both weaknesses while still being unmeasured. Option D decides by anecdote and urgency and leaves the question unanswered.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/define-success\">Define success criteria</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "eval-objective-variant-comparison",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your eval covers an assistant that must answer with raw Python, JSON config, or a regex depending on the task. The grader runs <code>json.loads</code> on every output, so all Python and regex answers — 60% of the dataset — score 0, drowning out real regressions.\n\nWhat is the right fix?\n\nA. Record each test case's expected output format in the dataset and dispatch the matching syntax validator per case.\nB. Require the assistant to wrap every answer in a JSON envelope so a single validator suffices for all tasks.\nC. Replace the syntax validators with a model grader that can read any output format.\nD. Trim the dataset to JSON-only tasks so the scores are internally comparable.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: code-based grading requires knowing the expected format, so each test case should carry a format field that lets the harness select the JSON, Python, or regex validator. Option B reshapes the product to fit the test — users need raw output, not an envelope. Option C trades deterministic checks for cost and variance on a purely mechanical property. Option D deletes 60% of the coverage the eval exists to provide.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "eval-format-aware-graders",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your extraction eval's only grader is a syntax check: the output parses as JSON and contains the required keys. It reports 100%. Meanwhile, support tickets show the extracted totals are wrong on roughly 1 in 5 invoices.\n\nWhat does this gap indicate about the eval?\n\nA. The dataset is too small; scale it up with more invoices until the score starts to drop.\nB. The eval measures validity, not correctness; add grading of extracted values against expected answers.\nC. The syntax grader is buggy, because a passing eval should imply accurate extraction of every field.\nD. Concurrency in the eval harness is corrupting results; rerun the suite serially to confirm the score.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: a grader can only detect what it measures, and syntactic validity says nothing about whether the total is the right number. Pairing a code grader for structure with value-level grading — expected-answer comparisons or a model grader — measures both dimensions. Option A changes nothing, since more cases graded by the same blind check still score 100%. Option C is wrong; the grader does its job, the gap is missing coverage. Option D invents an infrastructure cause with no supporting evidence.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/define-success\">Define success criteria</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "eval-syntax-vs-semantic-coverage",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are building an eval for a Claude-powered CI reviewer. Today it flags about 30 issues per PR and developers dismiss about 25 of them as noise. Engineers disagree on whether the next prompt version should be judged on thoroughness, precision, or developer satisfaction, and grader design is blocked.\n\nWhat must the team establish first?\n\nA. A production dashboard tracking developer sentiment about the reviewer over time.\nB. A larger grader model, since the disagreement shows grading is too hard for smaller ones to do well.\nC. Separate prompts per issue category so each quality dimension can be improved independently.\nD. Agreed success criteria and metrics, such as a target dismissal rate, before any grader is built.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: an eval needs its criteria defined up front, because a grader can only return an objective signal once 'good' has been specified — here, a measurable target such as the false-positive (dismissal) rate turns the debate into a metric. Option A relies on sentiment, a lagging proxy that conflates many causes. Option B cannot resolve an unspecified standard with more model capacity. Option C restructures the product before the team knows what it is optimizing.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/define-success\">Define success criteria</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "eval-success-criteria-first",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your meal-planning prompt begins: 'Here is some information about an athlete. It would be great to get some help with their nutrition.' On your eval it scores 2.4/10 — outputs ramble about general nutrition and frequently omit an actual meal plan.\n\nWhat is the highest-leverage first revision?\n\nA. Wrap the athlete's data in XML tags so the model can locate it reliably within the prompt text.\nB. Open with an action-verb instruction naming the task and output: 'Generate a one-day meal plan for this athlete.'\nC. Append several example meal plans demonstrating the expected structure, sections, and level of detail.\nD. Move the workload to a higher-intelligence model tier better suited to open-ended nutrition requests like this.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: the first line is the most important part of a prompt, and an action verb plus an explicit task and output tells the model exactly what to produce — without it, no other technique has a defined target. Option A helps the model parse inputs but never states the job. Option C refines a task that has not yet been specified, which is premature. Option D treats capability as the constraint when the request itself is undefined.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct\">Be clear and direct</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview\">Prompt engineering overview</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "pe-clear-direct-first-line",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "After making the meal-plan prompt clear and direct, outputs stay on task but vary wildly: some plans have three meals, others seven; some include macros, others none; portion units are inconsistent. The eval stalls near 3.9/10, with graders citing structural violations.\n\nWhich technique most directly targets these failures?\n\nA. Add step-by-step reasoning instructions so the model thinks through the plan before writing it out.\nB. Ask the model to self-review its plan and revise it within the same response before finishing.\nC. Set temperature to 0 so the plan structure becomes deterministic across repeated runs.\nD. Specify the required output attributes as explicit guidelines: meal count, sections, units, and length.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: inconsistent structure means the required qualities were never stated. Attribute guidelines pin down the characteristics of the output and are recommended for nearly every prompt. Option A shapes the reasoning process, but the failure here is unspecified output shape, not flawed reasoning. Option B is over-engineering — self-review cannot recover requirements that were never given. Option C reduces run-to-run randomness, yet each run would still guess at unstated requirements.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct\">Be clear and direct</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices\">Claude prompting best practices</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "pe-output-attribute-guidelines",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your meal plans now follow the required structure, but 20% still violate the athlete's stated dietary restriction — dairy in a lactose-free plan, for instance — usually when restrictions interact with training-goal requirements. Formatting compliance is near-perfect.\n\nWhat prompt change best addresses these failures?\n\nA. Prescribe steps: list the restrictions, draft the plan, then verify each item against every restriction.\nB. Add an output guideline stating that dietary restrictions must always be respected in the final plan.\nC. Retry each request up to three times and keep the first plan that passes a restriction check.\nD. Require JSON output so restriction violations surface as parse errors in the pipeline.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: this is a reasoning-process failure — the model is not systematically weighing restrictions against goals — and step guidelines direct how it works through complex, multi-constraint problems. Option B restates a constraint the prompt already implies without changing the process that misses it. Option C is wasteful at a 20% failure rate and remains non-deterministic. Option D is a category error: a dairy item in a lactose-free plan is semantically wrong yet parses perfectly.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/chain-of-thought\">Let Claude think (CoT)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct\">Be clear and direct</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "pe-reasoning-steps-guidance",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your debugging assistant's prompt concatenates the user's code, an excerpt of vendor API documentation, and the user's question into one undelimited block of text. In 15% of sessions Claude quotes the documentation's example code as if it were the user's code, and occasionally answers a question posed inside the documentation instead of the user's.\n\nWhat is the most effective revision?\n\nA. Add a sentence explaining that the user's code appears first and the documentation second in the prompt.\nB. Move the documentation excerpt into the system prompt to separate it from the user's code and question.\nC. Shorten the documentation excerpt so there is less material for the model to confuse.\nD. Enclose each input in descriptive XML tags such as <code>&lt;user_code&gt;</code>, <code>&lt;api_docs&gt;</code>, and <code>&lt;question&gt;</code>.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: when several pieces of content are interpolated into one prompt, descriptively named XML tags make the boundaries and the role of each block explicit, which removes exactly this cross-contamination. Option A relies on fragile positional prose that the model must track across a long block. Option B misuses the system parameter, which is for standing behavior, and still leaves code and question undelimited. Option C reduces available context without addressing why the blocks blur together.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/use-xml-tags\">Use XML tags</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "pe-xml-content-boundaries",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your support-ticket classifier labels each message complaint, praise, or question. Sarcastic complaints — 'Great, third broken order this month, amazing work!' — are labeled praise in 12% of cases. The prompt already warns: 'Watch carefully for sarcasm; sarcastic praise is a complaint.'\n\nWhat is the most effective next step?\n\nA. Escalate the wording to 'CRITICAL: never mislabel sarcasm' and repeat it at the end of the prompt.\nB. Add an upstream sentiment-analysis model that flags sarcasm before the classifier runs.\nC. Add few-shot examples of sarcastic messages, each with the correct label and a short note on why.\nD. Set temperature to 0 so the labels stop varying between runs on similar messages.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: when instruction tweaks plateau on ambiguous inputs, examples that demonstrate the correct handling of those exact cases are the stronger tool — few-shot prompting exists precisely for corner cases like sarcasm, and pairing each example with its reasoning reinforces the pattern. Option A repeats an instruction that is already present and already ignored; louder is not clearer. Option B is over-engineered, and sentiment analysis is itself unreliable on sarcasm. Option D targets sampling noise, but these are systematic misreadings.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/multishot-prompting\">Use examples (multishot)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices\">Claude prompting best practices</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "pe-fewshot-ambiguous-cases",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your incident-summary prompt describes the required report format in 14 lines of prose: header fields, a timeline with relative timestamps, an impact section quoting affected-customer counts, then remediation bullets. Outputs get the sections roughly right, but 40% deviate — wrong ordering, absolute timestamps, or missing counts.\n\nWhat most reliably locks in the format?\n\nA. Extend the format description to explicitly forbid each deviation observed so far.\nB. Include one or two complete exemplar reports, wrapped in <code>&lt;example&gt;</code> tags, after the instructions.\nC. Wrap the incident input data in XML tags so the model parses the source material more accurately.\nD. Split the task into four prompts, one per section, and concatenate their outputs in order.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: complex output formats are a primary use case for examples — a full exemplar demonstrates ordering, timestamp style, and phrasing at once, and showing beats describing. Option A extends a description that has already failed at 14 lines; enumerating anti-patterns grows the prompt faster than it fixes drift. Option C targets input comprehension, but the failure is output form. Option D adds chaining cost and complexity before the cheap fix has been tried.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/multishot-prompting\">Use examples (multishot)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview\">Prompt engineering overview</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "pe-fewshot-output-format",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A teammate inherits a prompt scoring 3.1/10 and proposes a single mega-change before the next eval run: eight few-shot examples, chain-of-thought steps, XML restructuring, and a split into a three-prompt chain, all at once.\n\nWhat approach improves the prompt most effectively?\n\nA. Apply every proposed technique at once to maximize the improvement gained from a single eval run.\nB. Start with the chain split, since architectural changes outweigh wording changes in their impact.\nC. Apply techniques one at a time, starting with clear, direct instructions, re-running the eval after each.\nD. Start with the few-shot examples, since examples are the strongest single technique available here.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: the workflow that works is to apply one technique at a time in rough order of leverage — clarity and directness first — and measure after each, so you know what helped and can stop when scores suffice. Option A confounds four changes; if the score moves you cannot attribute it, and regressions hide inside gains. Option B puts the heaviest change first, inverting the cost-benefit ordering. Option D anchors examples to a task that is still ill-posed.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview\">Prompt engineering overview</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct\">Be clear and direct</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "pe-incremental-technique-order",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are adding few-shot examples to a contract-clause classification prompt to fix recurring edge-case mistakes.\n\nWhich TWO practices most increase the examples' effectiveness? (Select TWO.)\n\nA. Place the examples before the task instructions so the model encounters them first.\nB. Delimit each example with XML tags that separate the sample input from the ideal output.\nC. Pair each example with a brief explanation of why its output is the correct one.\nD. Draw the examples from an unrelated domain so the model generalizes rather than memorizes.",
+    "Back": "<b>Correct Answer: B and C.</b> Option B keeps examples unambiguous — clear delimitation prevents sample inputs and outputs from being read as live task content. Option C reinforces the pattern being taught: stating why an output is ideal turns an example into a rule the model can apply to new edge cases. Option A inverts the recommended structure; examples belong after the main instructions and guidelines. Option D discards the point of few-shot prompting, which works by demonstrating the actual task's hard cases — unrelated samples teach the wrong distribution.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/multishot-prompting\">Use examples (multishot)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/use-xml-tags\">Use XML tags</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-2",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "pe-fewshot-construction",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your travel agent's <code>search_flights</code> tool description is one sentence: 'Searches flights.' In production, 28% of calls fail validation because Claude passes city names where the tool requires IATA airport codes, and the tool is also invoked for hotel and rental-car questions it cannot answer.\n\nWhat is the most effective fix?\n\nA. Rename the tool <code>search_flights_by_iata_code</code> so the required input format is obvious from its name alone.\nB. Expand the description: purpose, when to use it and when not to, the IATA input format with an example, and what it returns.\nC. Accept city names in the backend and silently resolve them to airport codes before running the search, so calls stop failing.\nD. Add a routing classifier that hides the tool unless the user's request explicitly mentions flights or airports by name.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: the description is the primary interface the model uses to decide when and how to call a tool, and a detailed one — purpose, usage boundaries, input formats, return value, limitations — is the single most important factor in tool performance. It fixes both the format errors and the off-domain calls at their source. Option A encodes one fact in a name and leaves boundaries and returns unstated. Option C patches the format server-side while hiding the contract from the model and does nothing about hotel and car misuse. Option D bypasses the model's tool selection instead of informing it.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools\">Define tools (schemas, descriptions)</a>\n&bull; <a href=\"https://www.anthropic.com/engineering/writing-tools-for-agents\">Writing tools for agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-description-quality-depth",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your <code>create_ticket</code> tool's <code>input_schema</code> declares <code>priority</code>, <code>due_date</code>, and <code>assignee_id</code> — all typed as bare strings with no property descriptions and an empty <code>required</code> list. Claude omits <code>priority</code> in 30% of calls and formats dates inconsistently.\n\nWhich schema change most improves call reliability?\n\nA. Collapse the three properties into one free-text <code>details</code> string that the backend parses into fields itself.\nB. Keep the schema minimal and document the arguments in the tool's <code>description</code> prose instead of the schema.\nC. Define <code>priority</code> as an enum, document <code>due_date</code>'s format with an example, and list required fields.\nD. Apply backend defaults for any missing or malformed value so that no call ever fails validation downstream.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: <code>input_schema</code> is the machine-readable contract — types, enums, per-property descriptions, and the <code>required</code> list tell the model exactly what a valid call looks like, and a field is omitted precisely because nothing marks it required. Option A throws away structure and moves the parsing burden into your code. Option B helps but cannot replace the schema, which is where the model reads types and requirements. Option D fabricates intent: a guessed priority is data corruption, not reliability.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools\">Define tools (schemas, descriptions)</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-input-schema-precision",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your support agent's response contains two <code>tool_use</code> blocks — <code>get_order_status</code> for order #A123 and for #B456. Your handler executes both, then returns the outputs as two plain text blocks in the next user message. Claude's answer attributes #B456's status to #A123, and some requests fail with an error that tool_use ids lack corresponding tool_result blocks.\n\nHow must the outputs be returned?\n\nA. As <code>tool_result</code> blocks in the next user message, each carrying the <code>tool_use_id</code> of the call it answers.\nB. As one text block in the next user message, listing each order's status on its own labeled line.\nC. As two consecutive user messages, one result per message, sent in the order the calls were made.\nD. As a single <code>tool_result</code> block whose content contains both outputs joined by a delimiter.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: every <code>tool_use</code> block carries a unique id, and each result must be a <code>tool_result</code> block referencing that id — this pairing is how the API matches parallel calls to their outputs. Option B is not a tool result at all; the protocol error persists and attribution stays guesswork. Option C is wrong because all results for one assistant turn belong in the single next user message; splitting leaves the first message missing a required result. Option D cannot answer two ids with one block, so the unmatched id still errors.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls\">Handle tool calls</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works\">How tool use works</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-result-id-pairing",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your <code>add_duration_to_datetime</code> tool raises <code>ValueError</code> on unsupported date formats. The exception currently propagates up and crashes the whole agent loop, ending the conversation — about 7% of scheduling sessions.\n\nWhat is the best handling?\n\nA. Validate inputs before execution and silently drop any tool call that would raise an error.\nB. Catch the exception and return <code>is_error: true</code> with the content 'Operation failed' to avoid leaking internals.\nC. Catch the exception and return a normal result containing an empty string so the loop continues.\nD. Catch the exception and return <code>is_error: true</code> with content naming the invalid input and the expected format.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: tool errors are conversational data — the content of an <code>is_error</code> result is visible to Claude, and a specific message stating what was invalid and what is expected lets it retry with corrected arguments, turning a crash into a self-correcting exchange. Option A leaves the requested call's id unanswered, which is a protocol error, and hides the failure. Option B flags failure but strips the context needed to correct course, inviting blind retries. Option C is silent suppression: Claude treats an empty string as success and builds an answer on nothing.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls\">Handle tool calls</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/troubleshooting-tool-use\">Troubleshooting tool use</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-error-result-design",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your invoice pipeline defines a <code>record_invoice</code> tool whose schema mirrors your database row, with the instruction 'Always call the tool.' In 5% of runs Claude replies with a prose summary and no <code>tool_use</code> block, crashing the downstream parser. Reliability matters more here than implementation simplicity.\n\nWhat change guarantees the structured output?\n\nA. Strengthen the instruction to 'You MUST call record_invoice. Never reply in text.' and place it last in the prompt.\nB. Prefill the assistant message with an opening brace and parse the JSON from the text completion.\nC. Set <code>tool_choice</code> to <code>{\"type\": \"tool\", \"name\": \"record_invoice\"}</code> on the request.\nD. Detect prose replies and automatically resend the request until a <code>tool_use</code> block appears.",
+    "Back": "<b>Correct Answer: C.</b> Option C is correct: forcing the tool through <code>tool_choice</code> is a request-level guarantee — the model must call the named tool, so every response carries schema-shaped input. Option A is prompt-level enforcement, which is probabilistic and is the approach already failing at 5%. Option B is the lightweight prefill-and-stop-sequence technique, fine for quick extractions but yielding unvalidated free text — the weaker choice when reliability is the stated priority. Option D pays latency and tokens to chase what a parameter guarantees outright.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use\">Implement tool use</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/structured-outputs\">Structured outputs</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-choice-forced-extraction",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your order-management agent defines four action tools: refund, replace, escalate, and request_info. Policy requires every customer message to be handled through one of these actions — a free-text reply is never acceptable. With default settings, 10% of responses contain only text.\n\nWhich change enforces the policy?\n\nA. Set <code>tool_choice</code> to <code>{\"type\": \"any\"}</code> on every request.\nB. Set <code>tool_choice</code> to <code>{\"type\": \"tool\", \"name\": \"escalate\"}</code> as a safe default action.\nC. Keep <code>auto</code> and add 'You must always use one of your tools' to the system prompt.\nD. Merge the four tools into a single <code>handle_message</code> tool so there is no selection to make.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: <code>any</code> requires the model to call one of the provided tools while leaving the choice of which tool to the model — exactly the policy: some action, the model's judgment about which. Option B forces every message into escalation, discarding the routing the agent exists to perform. Option C is prompt-only enforcement where a deterministic parameter exists. Option D restructures the toolset without forcing a call — under <code>auto</code> the model can still answer in plain text.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use\">Implement tool use</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview\">Tool use overview</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-choice-any-enforcement",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your UI shows Claude's short explanation ('I'll look up that order now...') above each tool call. After you set <code>tool_choice</code> to <code>{\"type\": \"any\"}</code> to eliminate text-only replies, those explanations vanished — responses now contain only <code>tool_use</code> blocks, even though the system prompt still explicitly asks for a one-sentence explanation before every call.\n\nWhy did the narration disappear, and what restores it?\n\nA. Tool-call JSON is consuming the token budget; raise <code>max_tokens</code> so the explanation text fits again before the call.\nB. Forced tool use (<code>any</code> or <code>tool</code>) prefills the assistant turn with a tool call, so no text precedes it; use <code>auto</code> instead.\nC. Tool schemas take precedence over the system prompt; move the narration instruction into each tool's description field.\nD. The explanations moved into hidden reasoning content; extract them from the response metadata instead of the content blocks.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: forcing tool use works by prefilling the assistant message, so the model cannot emit natural-language text before the <code>tool_use</code> block regardless of instructions — a documented trade-off. When narration matters, the sanctioned pattern is <code>auto</code> plus an explicit instruction to use the tool. Option A is wrong because no token-budget mechanism suppresses leading text under <code>any</code>. Option C misstates precedence; descriptions inform tool selection and cannot restore text a prefill forecloses. Option D describes a channel that does not hold the explanation.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use\">Implement tool use</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-forced-choice-no-text",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Since forcing your <code>record_invoice</code> extraction tool, 100% of outputs validate against the <code>input_schema</code>. Yet on 6% of documents the <code>total</code> field carries the invoice's subtotal rather than its grand total — both well-formed currency values.\n\nWhat does this failure mode demonstrate?\n\nA. The <code>total</code> property needs a stricter regex <code>pattern</code> so that incorrect amounts fail schema validation at the API.\nB. Schema conformance guarantees structure, not meaning; clarify the field definition and add value-accuracy checks.\nC. <code>tool_choice</code> should return to <code>auto</code> so the model can decline to extract when it is unsure which amount is the total.\nD. <code>total</code> should be the schema's only required field so the model concentrates on getting that one value right.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: validation answers 'is this shaped correctly,' never 'is this the right value' — a subtotal is indistinguishable from a grand total to any schema. Semantic errors need their own defenses: disambiguating the field's definition in the description or prompt, and measuring value accuracy with evals or arithmetic cross-checks. Option A tests format, and the wrong amount matches the format perfectly. Option C abandons the structure guarantee without making values any more correct. Option D weakens the schema for other fields and still does not say which amount is wanted.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/structured-outputs\">Structured outputs</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-schema-vs-semantic-accuracy",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An audit of your document-extraction tool finds two recurring defects. First, invoices with no printed PO number receive plausible-looking fabricated <code>po_number</code> values, because the schema requires a non-null string. Second, about 8% of tickets fit none of the <code>category</code> enum's six values, so Claude forces them into the nearest wrong category.\n\nWhich TWO schema changes address these defects? (Select TWO.)\n\nA. Add a regex <code>pattern</code> for <code>po_number</code> so invented values fail validation and are rejected by the API.\nB. Make <code>po_number</code> nullable and document that null means no PO number appears in the document.\nC. Shrink the <code>category</code> enum to its three most frequent values so ambiguous tickets have fewer wrong choices.\nD. Add an <code>other</code> value to the <code>category</code> enum plus a detail field describing tickets that use it.",
+    "Back": "<b>Correct Answer: B and D.</b> Both defects share a root cause: the schema gives the model no way to express 'absent' or 'none of these,' so it must fabricate. Option B legitimizes absence for <code>po_number</code> — the model can return null instead of inventing a value. Option D gives out-of-taxonomy tickets an honest home while the detail field preserves the information routing needs. Option A does not help: fabricated values are plausible and usually match the real format, and rejection still leaves the model bound to supply something. Option C moves in the wrong direction — a smaller taxonomy leaves even more tickets with no honest home, so more of them get forced into a wrong category, and it does nothing about <code>po_number</code>.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations\">Reduce hallucinations</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/structured-outputs\">Structured outputs</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools\">Define tools (schemas, descriptions)</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-3",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-schema-antifabrication",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your operations agent answers 'compare stock across our five regional warehouses' by calling <code>check_inventory</code> once per warehouse over five sequential assistant turns — about 40 seconds of accumulated round-trip latency. The five lookups are fully independent of one another.\n\nWhich TWO changes most reduce the number of request-response cycles? (Select TWO.)\n\nA. Keep parallel tool use enabled and have the handler run every <code>tool_use</code> block in a response before replying.\nB. Set <code>disable_parallel_tool_use</code> to true so each lookup is guaranteed to finish before the next one is requested.\nC. Add a batch tool that accepts a list of tool invocations and executes them all in a single round trip.\nD. Raise <code>max_tokens</code> so the model has enough output budget to plan all five calls within a single turn.",
+    "Back": "<b>Correct Answer: A and C.</b> Option A lets one assistant turn carry several tool calls, collapsing five cycles toward one when the model parallelizes — provided the handler answers every id in a single user message. Option C attacks the same waste from the tool-design side: a batch tool packages many invocations into one call, forcing single-cycle execution even when the model would otherwise sequence its requests. Option B does the opposite of what is needed: <code>disable_parallel_tool_use</code> limits the model to one tool call per turn, locking in five sequential cycles. Option D misunderstands the constraint — output budget does not cause sequential calling, and more tokens do not merge turns.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/parallel-tool-use\">Parallel tool use</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use\">Implement tool use</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-1",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-parallel-batch-roundtrips",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "During a design review for a <code>send_refund</code> tool, a product manager asks whether defining the tool means Anthropic's infrastructure will move the money. A teammate claims Claude 'runs the tool in its sandbox and reports the outcome.'\n\nWhich description of custom-tool execution is accurate?\n\nA. Claude executes custom tools in an isolated environment and returns their side effects to your application afterward.\nB. Claude emits a <code>tool_use</code> request with the tool name and arguments; your code runs the action and returns a <code>tool_result</code>.\nC. The API executes a tool only when <code>tool_choice</code> forces it; otherwise your server is responsible for running it yourself.\nD. Custom tools run on Anthropic's servers unless you register them as external endpoints in the request body.",
+    "Back": "<b>Correct Answer: B.</b> Option B is correct: for tools you define, the model's role ends at the request — it decides to call and supplies arguments, while execution and every side effect happen exclusively in your code, which reports back through a <code>tool_result</code>. A few built-in server tools such as web search are the exception and run on Anthropic's side; custom tools never do. Options A and D attribute execution to infrastructure that never sees your refund system and offers no registration mechanism for it. Option C is wrong because <code>tool_choice</code> governs whether and which tool gets requested, never where it executes.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works\">How tool use works</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview\">Tool use overview</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-client-execution-model",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your agent loop stores history as plain strings: after each response it extracts only the text and discards the <code>tool_use</code> blocks. When the follow-up request containing a <code>tool_result</code> block is sent, the API rejects it with a 400 error referencing an unknown <code>tool_use_id</code>.\n\nWhat is the fix?\n\nA. Append the assistant response's full content, <code>tool_use</code> blocks included, to history before sending the <code>tool_result</code>.\nB. Move the <code>tool_result</code> block into an assistant message, since the tool ran on your own server rather than Claude's.\nC. Omit <code>tool_use_id</code> from the result blocks so the API stops validating the linkage between calls and results.\nD. Start a fresh conversation for each tool round, carrying the prior text along as plain context in a user message.",
+    "Back": "<b>Correct Answer: A.</b> Option A is correct: the API validates the transcript it receives, so a <code>tool_result</code> must answer a <code>tool_use</code> present in the preceding assistant message — history has to preserve the full multi-block content, not a text summary (and the follow-up should keep sending the <code>tools</code> definitions). Option B is wrong because tool results belong in user messages regardless of where execution happened. Option C removes the required pairing mechanism. Option D discards the very turn structure the result must attach to, recreating the error.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls\">Handle tool calls</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/working-with-messages\">Working with messages</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-1"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-loop-history-blocks",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You force an <code>extract_fields</code> tool purely to capture structured JSON — nothing is executed. A teammate's implementation still sends back a <code>tool_result</code> reading 'extraction received' and makes a second API call so the conversation 'completes properly,' doubling the pipeline's cost and latency.\n\nWhat should the pipeline do instead?\n\nA. Set <code>tool_choice</code> to <code>none</code> on the follow-up call so it finishes faster and cheaper.\nB. Keep the second call, because every <code>tool_use</code> block requires a <code>tool_result</code> for the request to be valid.\nC. Switch to a prefill-and-stop-sequence text completion so the pipeline avoids tools entirely.\nD. Read the structured data from the <code>tool_use</code> block's <code>input</code> and stop; no <code>tool_result</code> round trip is needed.",
+    "Back": "<b>Correct Answer: D.</b> Option D is correct: in extraction-only usage the tool call itself is the deliverable — the schema-conforming data sits in the <code>tool_use</code> block's <code>input</code>, and the interaction can end there. A result block is required only if you continue the conversation, so ending it makes the second call pure overhead. Option A still pays for the useless round trip. Option B overstates the rule: the pairing requirement applies to transcripts you send back, not to conversations you end. Option C swaps to the lighter, less reliable technique and changes the architecture instead of removing the redundant step.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use\">Implement tool use</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/structured-outputs\">Structured outputs</a>"
+   },
+   "tags": [
+    "domain::d2",
+    "task::2-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "tool-extraction-no-tool-result",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are building a Q&amp;A assistant over 4,000 pages of developer documentation written in markdown with consistent <code>##</code> section headers. The current pipeline splits every page into fixed 500-character chunks, and retrieval review shows that 35% of retrieved chunks start or end mid-sentence, often combining the tail of one topic with the head of the next. Users complain that answers cite loosely related sections.\n\nWhich chunking change most directly addresses the problem?\n\nA. Reduce the chunk size from 500 to 200 characters so each chunk spans fewer topics.\nB. Switch to an embedding model with higher-dimensional vectors for finer-grained similarity.\nC. Chunk on the markdown headers so each chunk is one complete, single-topic section.\nD. Retrieve 20 chunks per query instead of 5 so relevant content is more likely to be present.",
+    "Back": "<b>Correct Answer: C.</b> Structure-based chunking is the right strategy when documents carry reliable structure: splitting on the <code>##</code> headers yields complete, coherent, single-topic chunks, eliminating mid-sentence cuts and mixed-topic chunks at the source. Option A makes fragmentation worse, since smaller fixed-size chunks cut even more sentences and carry less context each. Option B changes how chunks are represented, but the chunks themselves still mix topics, so better vectors index the same flawed units. Option D compensates by stuffing more partially relevant chunks into the prompt, raising cost and distraction without improving chunk quality.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/learn\">Anthropic Academy</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "rag-structure-based-chunking",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your RAG pipeline ingests exported support tickets with no reliable formatting, so you fall back to size-based chunking. Evaluation shows failures concentrated at chunk boundaries: sentences are cut in half, and a chunk often lacks the preceding sentence that established what a pronoun refers to. Ticket formats vary too much for header- or section-based splitting to work.\n\nWhat is the most appropriate first adjustment to the chunking step?\n\nA. Add overlap so each chunk also includes a portion of the text from its neighboring chunks.\nB. Move to semantic chunking that groups related sentences using an NLP similarity model.\nC. Double the number of chunks retrieved per query to compensate for the boundary losses.\nD. Embed each chunk twice with two different embedding models to raise the odds of a match.",
+    "Back": "<b>Correct Answer: A.</b> Option A is the standard remedy when size-based chunking must be used: overlapping neighboring chunks preserves boundary context, so the cut-off sentence and the antecedent of that pronoun appear intact in at least one chunk, at the modest cost of some duplicated text. Option B reaches for the most complex chunking strategy before the simple, common fix has been tried. Option C retrieves more chunks that all still have damaged boundaries — more context, same defect, higher cost. Option D changes the representation rather than the content: both embeddings describe the same truncated chunk.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/learn\">Anthropic Academy</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "rag-chunk-overlap",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your developer-tools knowledge base is indexed with embeddings only. When users search for exact identifiers — error codes like <code>ERR_CONN_4012</code>, flag names, function names — evaluation shows the right document reaching the top five results only 41% of the time, while natural-language concept questions score 87%. The failing queries all hinge on rare, specific terms that appear verbatim in just a handful of documents.\n\nWhat change to the retrieval layer best addresses the failing queries?\n\nA. Increase the number of retrieved chunks from 5 to 20 whenever a query contains an identifier.\nB. Prompt Claude to reason about which retrieved chunks look most relevant before answering.\nC. Re-embed the corpus with a larger embedding model that captures identifiers more precisely.\nD. Add a BM25 lexical index alongside the vector index and merge results from both.",
+    "Back": "<b>Correct Answer: D.</b> Option D targets the root cause: BM25 ranks by exact term matches and weights rare terms highly — precisely the signal that semantic embeddings under-represent — so hybrid search covers identifier queries while embeddings keep handling paraphrased concept questions. Option A retrieves more semantically similar but still wrong chunks; the exact-match signal is absent no matter how many results you take. Option B cannot help because the correct chunk was never retrieved — the model cannot reason its way to content that is not in the prompt. Option C still relies on semantic similarity, which remains the wrong matching paradigm for verbatim rare tokens.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/learn\">Anthropic Academy</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/embeddings\">Embeddings guidance</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "rag-bm25-exact-terms",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "An internal search service over HR policy documents uses BM25 lexical search only. Employees phrase questions conversationally — 'can I get money back for a canceled trip' — while the documents say 'reimbursement for travel cancellations.' For paraphrased queries that share almost no vocabulary with the documents, the correct policy lands in the top five results only 30% of the time, although keyword-style queries work well.\n\nWhich change best fixes the paraphrased-query failures?\n\nA. Append a glossary of keyword synonyms to every document so more query terms can match.\nB. Add a semantic embedding index and combine its results with the BM25 results.\nC. Tokenize queries more aggressively, stripping stop words and punctuation before matching.\nD. Boost the BM25 weighting of the rarest terms in each query so they dominate the ranking.",
+    "Back": "<b>Correct Answer: B.</b> Option B addresses the failure mode directly: embeddings represent meaning, so 'money back' and 'reimbursement' land near each other in vector space even with zero shared vocabulary, and keeping BM25 in the hybrid preserves the exact-term strength that already works. Option A is a manual, perpetually incomplete synonym list that must be maintained by hand. Option C still matches only shared vocabulary — the failing queries share none, so cleaner tokens change nothing. Option D sharpens exact-term matching, which is the mechanism that is failing, and does nothing for queries whose terms never appear in the documents.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/learn\">Anthropic Academy</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/embeddings\">Embeddings guidance</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "rag-embeddings-paraphrase",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your multi-index pipeline queries a vector index and a BM25 index in parallel. The vector index returns cosine distances between 0 and 2, while BM25 returns unbounded relevance scores that shift with corpus statistics. Your first merge implementation averaged the two raw scores per document, and documents from one index now systematically dominate the final ranking.\n\nHow should the two result lists be combined?\n\nA. Merge with Reciprocal Rank Fusion, scoring each document by its rank position in each list.\nB. Normalize the BM25 scores into the 0-2 range, then continue averaging the raw scores.\nC. Return vector results by default and fall back to BM25 only when vector search finds nothing.\nD. Deduplicate the two lists and interleave them, alternating one result from each index.",
+    "Back": "<b>Correct Answer: A.</b> Option A is the standard multi-index merge: Reciprocal Rank Fusion uses only rank positions (summing terms like 1/(rank + 1) across the lists), which sidesteps incomparable score scales entirely and rewards documents that rank well in both indexes. Option B makes the ranges superficially aligned, but the two scores measure different quantities and the BM25 distribution shifts as the corpus changes, so the blended number stays unstable; rank positions are robust to both problems. Option C discards the lexical signal on nearly every query instead of combining the paradigms — the goal of running both indexes. Option D preserves each list's order but ignores cross-index agreement, so a document ranked highly by both methods gets no advantage over one favored by only one.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/learn\">Anthropic Academy</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "rag-rrf-merge",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are designing retrieval for two systems. System 1 answers customer questions over a stable 60,000-page product manual and must ground answers with sub-second retrieval at thousands of queries per hour. System 2 is an engineering assistant answering deep questions over a monorepo where hundreds of files change daily; engineers accept multi-minute answers, but stale results are unacceptable.\n\nWhich retrieval architecture pairing best fits the two systems?\n\nA. Agentic search for both systems, letting an agent iteratively run search tools per query.\nB. A RAG embedding pipeline for both systems, re-embedding the monorepo on a nightly schedule.\nC. Agentic search for System 1 and a pre-built RAG embedding pipeline for System 2.\nD. A RAG embedding pipeline for System 1 and agentic search over the live repository for System 2.",
+    "Back": "<b>Correct Answer: D.</b> Option D matches each approach to its strengths: a pre-built index gives System 1 fast, single-shot retrieval over a corpus that rarely changes, while agentic search reads the live files at query time for System 2, so results are never stale and the agent can iteratively refine its queries — at a latency cost System 2 explicitly tolerates. Option A sacrifices System 1's latency target, since an agent running multiple search turns per query cannot deliver sub-second retrieval at that volume. Option B leaves System 2 up to a day stale between re-embedding runs, violating its freshness requirement while adding constant index maintenance. Option C inverts the fit on both axes, giving the latency-sensitive system the slow approach and the fast-changing corpus the stale one.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents\">Effective context engineering (Anthropic engineering)</a>\n&bull; <a href=\"https://www.anthropic.com/learn\">Anthropic Academy</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-4"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "rag-vs-agentic-search",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your RAG assistant concatenates the top retrieved chunks into the user prompt as plain text with an instruction to 'list your sources at the end.' In an audit, 18% of listed sources did not correspond to any retrieved chunk, and reviewers cannot tell which retrieved passage supports which sentence of an answer.\n\nWhat is the most reliable way to tie each claim in the response to the retrieved material?\n\nA. Add few-shot examples of well-formatted source lists to the system prompt so the model imitates them.\nB. Pass the retrieved chunks as document sources with citations enabled and read the returned citation blocks.\nC. Log the IDs of the retrieved chunks next to each stored answer so that auditors can look them up later.\nD. Set temperature to 0 so the model deterministically stops inventing sources it was never given.",
+    "Back": "<b>Correct Answer: B.</b> Option B uses the citations feature for what it exists to do: when retrieved chunks are supplied as proper source content with citations enabled, the API returns citation blocks that point into specific passages of the provided material, so every citation verifiably corresponds to a real retrieved span and each claim is anchored at the sentence level. Option A is still prompt-only generation — better-formatted source lists can still be fabricated, as the audit already showed. Option C gives request-level traceability but cannot connect an individual claim to an individual passage, and does nothing about invented sources in the response text. Option D removes randomness, not fabrication — a deterministic model can still produce the same invented source list every time.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/citations\">Citations</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/search-results\">Search results content blocks</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "rag-cite-retrieved-sources",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your contract-analysis prompt asks Claude to determine whether nested indemnification clauses conflict across a 30-page agreement — a task requiring multi-step logical reasoning. After several rounds of prompt engineering (clear instructions, XML structure, worked examples), the eval plateaus at 64%. Simpler extraction tasks in the same pipeline score 96% with the same techniques.\n\nWhat is the most appropriate next step for the failing task?\n\nA. Raise the temperature to 0.8 so the model explores more diverse reasoning paths.\nB. Have the model output a confidence score and route low-confidence contracts to a second pass.\nC. Enable extended thinking with a token budget for this task and re-run the eval.\nD. Increase <code>max_tokens</code> substantially so the model has more room for a longer answer.",
+    "Back": "<b>Correct Answer: C.</b> Option C follows the recommended sequence: extended thinking gives the model dedicated reasoning space before its final answer and is the lever to reach for when prompt optimization has plateaued on a genuinely complex reasoning task — and re-running the eval verifies that the added cost and latency are buying accuracy. Option A adds randomness, not reasoning; diverse wrong paths do not improve logical analysis. Option B routes on self-reported confidence, which is an unreliable signal that correlates poorly with actual errors. Option D expands room for output, but the failure is insufficient reasoning before the answer, not truncation of the answer itself.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/extended-thinking\">Extended thinking</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "feat-thinking-when-to-enable",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You enabled extended thinking with a 32,000-token budget on every request in an assistant that handles both trivial lookups and complex multi-document analyses. Since the change, p50 latency is up 45% and spend has risen sharply, but eval accuracy improved only on the complex analyses — about 15% of traffic — and stayed flat everywhere else.\n\nHow should you configure thinking going forward?\n\nA. Apply the large budget only to the complex analysis requests and disable or minimize thinking for simple lookups, tuning both with evals.\nB. Keep the 32,000-token budget everywhere but strip the thinking blocks out of responses so users have less content to wait for.\nC. Keep thinking on everywhere and raise the budget above <code>max_tokens</code> so that reasoning never crowds out room for the final answer.\nD. Keep the uniform budget but add a system-prompt instruction telling the model to think only briefly on easy questions.",
+    "Back": "<b>Correct Answer: A.</b> Option A matches the budget to task complexity: thinking tokens are billed and add latency, and their accuracy gains show diminishing returns on tasks that do not need deep reasoning, so a large budget belongs on the 15% of traffic where it measurably helps and not on trivial lookups. Option B misunderstands the cost — thinking tokens are generated and charged whether or not you display them, so latency and spend stay high. Option C is an invalid configuration, since the thinking budget must be below <code>max_tokens</code> (thinking counts toward it), and it makes the overspending worse rather than better. Option D leaves resource allocation to probabilistic instruction-following when a per-request parameter gives deterministic control over exactly this tradeoff.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/extended-thinking\">Extended thinking</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "feat-thinking-budget-tradeoff",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A compliance workflow answers auditors' questions from long regulatory filings supplied as plain text. The prompt instructs Claude to 'quote the exact passage and state its location for every claim.' Spot checks find quoted passages that do not appear anywhere in the filing and location references that are wrong, and the quoted text is billed as output tokens on every answer.\n\nWhat should you change to make the cited passages trustworthy?\n\nA. Add a second Claude call that verifies each quote appears verbatim in the filing and flags mismatches.\nB. Lower the temperature and add few-shot examples of accurate quoting to the prompt.\nC. Have Claude output character offsets for each quote so reviewers can check them faster.\nD. Provide the filing as a document with citations enabled and read locations from the returned citation blocks.",
+    "Back": "<b>Correct Answer: D.</b> Option D replaces self-reported quoting with the citations feature: cited text is anchored to actual locations in the provided source (character positions for plain text), so fabricated passages cannot be cited, Anthropic's evaluations show it selects relevant quotes more reliably than prompt-based quoting, and cited text does not count toward output tokens — solving the accuracy problem and the cost complaint together. Option A bolts a whole verification pass (extra latency and spend) onto a generation step that citations would make trustworthy in the first place. Option B is still prompt-only; fewer and prettier fabrications are still fabrications. Option C asks the model to self-report offsets, which it can invent exactly as it invents locations today.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/citations\">Citations</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations\">Reduce hallucinations</a>"
+   },
+   "tags": [
+    "domain::d5",
+    "task::5-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "feat-citations-vs-prompted-quotes",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A data team's service analyzes the same 30 MB CSV of quarterly transactions in roughly 200 Claude requests per day, base64-encoding the file into every request for the code execution tool to consume. Request payloads are enormous, and uploading the same bytes hundreds of times now dominates end-to-end latency.\n\nWhat is the right way to provide the file?\n\nA. Compress the CSV and have the generated code decompress it inside the container per request.\nB. Upload the CSV once through the Files API and reference its <code>file_id</code> in each request.\nC. Split the CSV into 1 MB pieces and attach only the pieces each analysis is likely to need.\nD. Enable prompt caching on the file content so subsequent requests can skip re-uploading it.",
+    "Back": "<b>Correct Answer: B.</b> Option B is exactly the Files API's purpose: upload a file ahead of time, get a file ID, and reference that ID in later requests instead of shipping raw data every time — payloads shrink to a short identifier, and the file plugs directly into code execution container workflows. Option A still transmits the (smaller) file on every request and adds a decompression step to every analysis. Option C introduces fragile manual partitioning, risks analyses that need pieces you did not attach, and still re-uploads data continually. Option D misunderstands caching: it reuses server-side processing of an identical prompt prefix, but the content must still be sent with each request, so upload size and bandwidth do not improve.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/files\">Files API</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool\">Code execution tool</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "feat-files-api-reuse",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your product team asks Claude for exact statistics — medians, correlation coefficients, cohort retention curves — over a 150,000-row usage dataset. The current design pastes sampled rows into the prompt and asks for the numbers directly; results differ between runs, and 20% of spot-checked figures are simply wrong.\n\nWhich approach produces trustworthy numbers?\n\nA. Include the full dataset in the prompt instead of a sample and set the temperature to 0.\nB. Enable extended thinking with a large budget so the model can work through the arithmetic step by step.\nC. Use the code execution tool: Claude writes and runs Python on the uploaded dataset and reports the results.\nD. Break the dataset into 50-row prompts and have Claude aggregate its own partial answers.",
+    "Back": "<b>Correct Answer: C.</b> Option C fixes the category error: a language model generates plausible tokens rather than performing verified arithmetic, so exact statistics should come from real computation — Claude writes Python, executes it in the sandboxed container, and reports the program's output, with the dataset supplied via the Files API. Option A makes wrong numbers repeatable rather than right, and a 150,000-row dataset in the prompt is impractical and expensive. Option B improves reasoning quality, but token-by-token arithmetic across thousands of rows remains unreliable at any thinking budget. Option D multiplies the problem, compounding error across thousands of unverified partial computations plus a final unverified aggregation.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool\">Code execution tool</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/files\">Files API</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "feat-code-execution-computation",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your customer-support assistant sends a 6,000-token system prompt and 14 tool schemas — identical on every request — followed by each user's short question. Traffic is 40,000 interactive requests per day, input tokens dominate the bill, and time-to-first-token is a recurring complaint.\n\nWhich change best reduces cost and latency without changing behavior?\n\nA. Enable prompt caching on the static tool schemas and system prompt so repeat requests reuse prior processing.\nB. Move the traffic to the Message Batches API to take advantage of the 50% batch discount on every request.\nC. Cut the system prompt and the tool descriptions down to brief one-line summaries to shrink the input.\nD. Reorder each request so the user's question is sent ahead of the static instructions and schemas.",
+    "Back": "<b>Correct Answer: A.</b> Option A is the textbook prompt-caching fit: a large, byte-identical prefix (tool definitions plus system prompt) repeated across a high volume of requests, where caching lets Claude reuse the processing work from prior requests instead of redoing it — cutting input cost and time-to-first-token with zero change in behavior. Option B trades away immediacy entirely; batches are asynchronous with no fixed turnaround, which is disqualifying for interactive chat. Option C reduces tokens by degrading the very instructions and tool descriptions the assistant relies on for quality and tool selection. Option D reduces neither tokens nor processing — it just buries the instructions after the question without saving anything.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-caching\">Prompt caching</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "feat-caching-static-prefix",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your team runs several Claude workloads and wants to use the Message Batches API where it fits: batched usage is charged at 50% of standard prices, requests are processed asynchronously with no latency guarantee, and all results arrive within an up-to-24-hour window (most batches finish much sooner).\n\nWhich TWO workloads are a good fit for the Batches API? (Select TWO.)\n\nA. A nightly job that extracts structured fields from 80,000 support tickets, with results needed by the next morning.\nB. A live chat assistant where support agents wait on each reply while customers are on the phone.\nC. A weekly regression eval that re-runs 5,000 test prompts and aggregates the graded results.\nD. A fraud-screening call in the checkout path that must return a decision within 2 seconds.",
+    "Back": "<b>Correct Answer: A and C.</b> Options A and C are high-volume workloads made of independent requests where nobody is waiting on any individual response — the exact profile batching is built for: both tolerate the up-to-24-hour completion window comfortably (overnight and weekly deadlines) and collect the 50% discount on every request. Option B fails on latency tolerance — agents are waiting in real time, and a batch offers no guarantee that any given reply returns in seconds. Option D is even stricter, a hard 2-second SLA in a transaction path, which an asynchronous API with no latency SLA cannot honor.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/batch-processing\">Batch processing</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/batches\">Message Batches API reference</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-5",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "feat-batch-workload-fit",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You submit a Message Batch of 50,000 structured-extraction requests, one per support ticket, and write each result back to its ticket row by array position — the first result to the first ticket, and so on. QA then finds extracted fields attached to the wrong tickets scattered throughout the table.\n\nWhat is the correct way to associate results with tickets?\n\nA. Retrieve results only after the batch status shows every request has ended, then keep the positional matching.\nB. Submit the tickets in smaller batches of 1,000 so that ordering is preserved within each batch.\nC. Sort the downloaded results by their processing timestamps before writing them back to the table.\nD. Give each request a unique <code>custom_id</code> — such as its ticket ID — and match each result on that field.",
+    "Back": "<b>Correct Answer: D.</b> Option D uses the mechanism the API provides for exactly this: batch results can be returned in any order, so each request carries a unique <code>custom_id</code> and results must be joined on it — keying it to the ticket ID makes the write-back deterministic. Option A changes nothing, because completion status has no bearing on result ordering, which is never guaranteed. Option B is the same wrong assumption at a smaller scale; ordering is not guaranteed at any batch size, and you add management overhead for nothing. Option C substitutes processing order for submission order — a different sequence that still has no relationship to your ticket list.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/batches\">Message Batches API reference</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/batch-processing\">Batch processing</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "feat-batch-custom-id",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "To cut model costs 50%, an engineer proposes running your ticket-triage agent — which averages five dependent tool calls per ticket (look up the customer, fetch the order, check the policy, then decide) — by submitting each ticket's opening request to the Message Batches API and letting the agentic loop 'run inside the batch overnight.'\n\nWhy will this design not work as proposed?\n\nA. The Batches API rejects any request whose parameters include <code>tools</code> or <code>tool_choice</code>, so an agent that defines tools cannot be submitted at all.\nB. Each batched request is one independent model call; tool results cannot be returned into the batch, so the loop stalls at the first tool call.\nC. Batches accept only single-turn requests, so the ticket's existing multi-message conversation history cannot be included in the submission.\nD. Tool results would come back out of order unless every individual tool call inside the loop were assigned its own separate <code>custom_id</code>.",
+    "Back": "<b>Correct Answer: B.</b> Option B describes the actual constraint: a batch is a set of independent, one-shot Messages requests, so when Claude responds with a tool-use request, that response is the final result of that batched request — there is no mechanism to execute your tool and continue the conversation inside the batch, which means a five-round dependent loop must run synchronously (or be restructured as one batch per turn across all tickets). Option A is false; <code>tools</code> and <code>tool_choice</code> are supported in batched requests. Option C is false; complete multi-turn conversation histories can be submitted — what cannot happen is adding new turns mid-batch. Option D misapplies <code>custom_id</code>, which correlates whole requests with their results and has nothing to do with tool-call sequencing.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/batch-processing\">Batch processing</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/batches\">Message Batches API reference</a>"
+   },
+   "tags": [
+    "domain::d4",
+    "task::4-5"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "feat-batch-no-tool-loop",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are choosing between a predefined workflow (a fixed sequence of Claude calls) and an autonomous agent for a document-processing system, and you list the system's characteristics to guide the decision.\n\nWhich TWO characteristics most strongly indicate that a workflow is the better architecture? (Select TWO.)\n\nA. Every document goes through the same four processing steps in the same order, known in advance.\nB. Each step's output must be separately evaluated and regression-tested before every release.\nC. Incoming requests vary so much that the required steps cannot be enumerated up front.\nD. The system should discover novel tool combinations to handle requests outside its original design.",
+    "Back": "<b>Correct Answer: A and B.</b> Options A and B are the two classic workflow signals: workflows fit when the exact sequence of steps is known ahead of time, and their fixed execution path is what makes per-step evals and regression testing tractable — the reliability and testability advantages that are the main reasons to prefer workflows over agents. Options C and D are the mirror-image signals for an agent: steps that cannot be predetermined and the need for dynamic tool composition. Building a workflow for C would force you to enumerate paths you cannot write down, and D describes flexibility that a predefined sequence by definition does not provide.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>\n&bull; <a href=\"https://www.anthropic.com/learn\">Anthropic Academy</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-3",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-workflow-signals",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A stakeholder requests a 'multi-agent AI platform' — a coordinator, specialist subagents, and long-term memory — whose job is to tag inbound sales emails with one of five categories and a priority level. Nothing has been prototyped yet, and the acceptance bar is 95% tagging accuracy on a labeled test set.\n\nHow should you begin?\n\nA. Build the coordinator and subagent framework first so the architecture can absorb whatever requirements come later.\nB. Build a routing workflow with a dedicated processing pipeline for each of the five email categories.\nC. Implement a single classification prompt with a few examples, score it on the labeled set, and add architecture only if accuracy falls short.\nD. Build an agent with CRM-search tools so it can gather additional customer context before tagging each email.",
+    "Back": "<b>Correct Answer: C.</b> Option C applies the core guidance: find the simplest solution that meets the requirement and add complexity only when it demonstrably improves outcomes — a single well-prompted classification call very often clears this kind of bar, and the labeled test set tells you immediately and objectively whether anything more is needed. Options A and D stand up agentic machinery — with its cost, latency, and less predictable behavior — before any evidence exists that a simple call fails. Option B adds a category-routing layer to a task that is itself a single classification; there is nothing downstream to route to that the one prompt does not already produce.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-start-simple",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your product-description generator uses one 900-token prompt with 12 constraints (no competitor mentions, no superlatives, plain-English tone, and so on). In evals, 30% of outputs violate at least one constraint, even after you restated the constraints twice within the prompt. Each individual violation is easy to detect when checked for on its own.\n\nWhich restructuring most improves constraint compliance?\n\nA. Add a paragraph warning the model that any output violating any constraint will be discarded.\nB. Move all 12 constraints into the system prompt and then repeat them again in the user message.\nC. Have the model append a self-assessed compliance score to each output and regenerate whenever the score is low.\nD. Chain the task: generate the draft, then run a focused second call that checks the constraints and rewrites any violations.",
+    "Back": "<b>Correct Answer: D.</b> Option D is prompt chaining applied to its signature use case: when a model cannot reliably satisfy many constraints in a single pass, splitting the work into sequential steps lets each call give one job its full attention — and a dedicated revision pass armed only with the constraint list reliably catches the violations the generation pass produces. Options A and B are prompt-only intensifiers; the stem shows that restating the constraints has already failed, and threats or repetition remain probabilistic compliance. Option C gates on self-reported confidence, which correlates poorly with actual violations, so it would regenerate the wrong outputs while passing real violations through.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/chain-prompts\">Chain complex prompts</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-prompt-chaining",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "One prompt currently handles all five support request types — refunds, technical troubleshooting, billing disputes, account access, and legal escalations. Each type needs a different tone, different tools, and different policies; the prompt has grown to 3,000 tokens, and every time you tune it for refunds, eval scores for troubleshooting drop.\n\nWhich workflow pattern addresses this interference?\n\nA. Parallelization: run all five specialized prompts on every request and have an aggregator pick the best answer.\nB. Routing: classify each request first, then hand it to a smaller prompt and toolset specialized for that category.\nC. Evaluator-optimizer: keep the shared prompt and add a critique loop until each output passes a quality review.\nD. Orchestrator-workers: let a coordinator decompose every ticket into subtasks delegated to specialist workers.",
+    "Back": "<b>Correct Answer: B.</b> Option B is the routing pattern's defining use case: distinct, well-separated input categories that each deserve a specialized downstream prompt — classification up front buys separation of concerns, so each category's prompt is optimized independently and tuning refunds can no longer regress troubleshooting. Option A runs five times the cost and latency on every request, and an aggregator choosing among four wrong-category answers and one right one adds failure modes rather than removing them. Option C polishes the outputs of a prompt whose root problem is internally conflicting instructions; the interference remains. Option D applies dynamic task decomposition to what is a single categorical dispatch — over-engineered for known, enumerable categories.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-routing-separation",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your research system reviews vendor contracts across four independent dimensions: data privacy, liability, pricing terms, and termination clauses. A single prompt covering all four misses about 25% of issues in whichever dimensions appear last in the instructions, and reviewers need results within roughly one call's latency, not four calls' worth.\n\nWhich structure fixes the missed issues while respecting the latency constraint?\n\nA. Sectioning: run four parallel calls, one per dimension, and aggregate the findings.\nB. A chained sequence of four calls, one dimension at a time, carrying findings forward.\nC. One call to a larger model with the four dimensions restated at both ends of the prompt.\nD. Voting: run the same full four-dimension review three times in parallel and merge the issues found.",
+    "Back": "<b>Correct Answer: A.</b> Option A is the sectioning form of parallelization: the four dimensions are independent subtasks, so each gets its own focused call — eliminating the attention-driven misses on later dimensions — while wall-clock time stays near a single call because they run simultaneously. Option B fixes the focus problem but stacks four calls of sequential latency, exactly what the requirement rules out. Option C is the bigger-model-and-more-emphasis fix for a structural attention problem; one overloaded prompt still juggles four analyses. Option D reruns the same overloaded prompt, and voting averages out random error but not systematic error — every run shares the same bias toward neglecting the later dimensions.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-parallel-sectioning",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "A code-review step flags insecure database queries before merge. A single Claude review call catches an injected test vulnerability in only 80% of runs, and the misses look random rather than systematic. The security team wants detection above 95% while keeping review time near a single call's latency.\n\nWhich change best raises detection?\n\nA. Have the reviewer output a confidence score per file and re-review any file scored below 0.7.\nB. Set the temperature to 0 so the reviewer behaves identically on every run of the same diff.\nC. Run several review calls in parallel on the same diff and flag anything that any run flags.\nD. Chain three sequential review passes, each one starting from the previous pass's findings.",
+    "Back": "<b>Correct Answer: C.</b> Option C is the voting form of parallelization: multiple independent attempts at the same task whose outputs are aggregated — if each run catches a miss-at-random vulnerability 80% of the time, taking the union across several parallel runs pushes detection far past 95% while latency stays near one call because the runs execute simultaneously. Option A gates re-review on self-reported confidence, a signal that correlates poorly with what the model actually missed. Option B makes results repeatable — including repeatable misses; determinism adds no recall. Option D triples latency and biases later passes toward confirming what earlier passes found instead of looking independently.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-parallel-voting",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your multi-agent research system pipes every query through a fixed pipeline: one search subagent, one analysis subagent, and one synthesis subagent, each run exactly once. Simple lookups waste two stages, while multi-domain questions — 'compare the last three years of privacy rulings across two jurisdictions' — fail because the number and type of searches required cannot be known until the query itself is examined.\n\nWhich pattern fits this variability?\n\nA. Extend the fixed pipeline to five stages so complex queries receive more search and analysis processing.\nB. Orchestrator-workers: a lead model examines each query, delegates the subtasks it decides are needed to workers, and synthesizes the results.\nC. Routing: classify queries as simple, medium, or complex and send each class to one of three fixed pipelines sized for it.\nD. Evaluator-optimizer: keep the current pipeline but loop the synthesis stage until an evaluator approves the answer.",
+    "Back": "<b>Correct Answer: B.</b> Option B matches the defining trigger for orchestrator-workers: subtasks that cannot be predicted in advance. The orchestrator dynamically decomposes each query, spawns however many search or analysis workers that particular question needs, and synthesizes their results — one search for a lookup, six for a cross-jurisdiction comparison. Option A keeps a predefined decomposition, just a longer one: still wasteful for lookups and still the wrong shape for novel query structures. Option C reduces the waste but each bucket still hides unbounded variety — a 'complex' pipeline is still a fixed pipeline. Option D iterates on synthesis quality when the failure happens upstream: the wrong set of searches was run in the first place, and no amount of re-synthesis recovers missing research.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-orchestrator-workers",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your synthesis subagent drafts research summaries that must satisfy a 10-point editorial rubric. Single-pass drafts fail the rubric 40% of the time even though the rubric is already included in the generation prompt. Separately, you have verified that a Claude call given a draft plus the rubric identifies the specific failing points with high agreement against human editors.\n\nWhich pattern best exploits that verified grading ability?\n\nA. Generate five independent drafts in parallel and publish whichever one the grader ranks best.\nB. Append the grader's rubric a second time at the end of the generation prompt so it gets more emphasis.\nC. Have the drafting model grade its own output and revise until it awards itself a passing score.\nD. Loop draft, grade, revise, feeding the grader's critique back to the drafter until the rubric passes or an attempt cap is hit.",
+    "Back": "<b>Correct Answer: D.</b> Option D is the evaluator-optimizer pattern — a generator and a distinct evaluator in a feedback loop — and it fits precisely because the two preconditions hold: clear evaluation criteria exist, and iterative refinement demonstrably adds value since the grader pinpoints the exact failing rubric points for the drafter to fix. Option A pays for five full drafts while discarding the grader's most valuable output, its specific critique; selection without refinement can leave you publishing the least-bad failure. Option B is repetition of instructions already present — the prompt-only approach that produced the 40% failure rate. Option C collapses the roles: self-grading is exactly the unreliable self-assessment the verified independent grader exists to replace.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.2</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/develop-tests\">Develop test cases (evals)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-2"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-evaluator-optimizer",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your deployment agent edits YAML service configs with a text-editing tool and then reports success. In 12% of runs the resulting file is invalid — an edit landed inside the wrong block, or the file had been changed by another process since the agent last saw it — yet the transcript shows the agent confidently reporting success anyway.\n\nWhich TWO changes most improve the agent's reliability? (Select TWO.)\n\nA. Add a system-prompt instruction telling the agent to be extremely careful with YAML structure and indentation.\nB. Have the agent re-read the file immediately before editing so its edits apply to the current state.\nC. Set the temperature of the editing calls to 0 so the same edit is produced on every run.\nD. After each edit, have the agent re-read or lint the file and treat any failure as feedback to fix before reporting success.",
+    "Back": "<b>Correct Answer: B and D.</b> Options B and D are environment inspection applied before and after action: an agent cannot assume the effect of its actions, so reading current state before editing eliminates the stale-file failures, and validating after editing converts silent corruption into feedback the agent can act on in-loop — fixing the wrong-block edits instead of reporting success over a broken file. Option A changes no observation the agent makes; a carefully worded prompt still leaves the agent blind to the file's actual state, so the same failures recur politely. Option C addresses randomness, but the failures stem from unobserved state, not variance — a deterministic edit against a stale or misread file is deterministically wrong.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://code.claude.com/docs/en/agent-sdk/agent-loop\">The agent loop</a>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-6",
+    "format::multi-response"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-environment-inspection",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "You are building an assistant for internal developer requests: 'find why this test is flaky,' 'upgrade this dependency and fix the breakage,' 'trace where this config value comes from.' After mapping 40 sample tickets you cannot write a step sequence that covers even half of them — yet all were solvable using file search, file reading, and command execution.\n\nWhich architecture fits this workload?\n\nA. An agent that plans its own steps per request, looping over a small set of general tools — search, read, execute — until done.\nB. A routing workflow that classifies each request into one of the 40 mapped types and runs that type's scripted steps.\nC. A chained workflow containing the union of all steps observed across the 40 tickets, executed in a fixed order.\nD. A parallelization workflow that runs every candidate step simultaneously and aggregates whichever ones succeed.",
+    "Back": "<b>Correct Answer: A.</b> Option A is the situation agents exist for: when required steps cannot be predetermined, the model plans dynamically, observes the environment after each action, and composes a small flexible toolset in ways you never enumerated — and the stem confirms the whole workload reduces to a few general capabilities. Option B scripts the past; the mapping already failed to cover half of the observed tickets, and novel request shapes keep arriving. Option C executes mostly irrelevant steps on every request and still breaks the moment a ticket needs an unobserved sequence. Option D parallelizes steps that are inherently dependent — you must find the flaky test before you can fix it — so running everything at once is incoherent for these tasks.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>\n&bull; <a href=\"https://www.anthropic.com/learn\">Anthropic Academy</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-3"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-when-to-use-agent",
+    "ordinal": 1
+   },
+   "media": []
+  },
+  {
+   "type": "basic",
+   "fields": {
+    "Front": "Your document-processing agent has 22 hyper-specific tools (<code>extract_invoice_date</code>, <code>extract_invoice_total</code>, <code>extract_po_number</code>, and so on). Every new document type triggers a request for three or four more tools, requests that match no existing tool simply fail, and the tool list already consumes 3,500 prompt tokens.\n\nHow should the toolset be redesigned?\n\nA. Keep the 22 specialized tools but write richer descriptions so the agent selects the correct one more often.\nB. Merge all 22 tools into one <code>extract_field</code> tool whose <code>operation</code> enum lists every supported field.\nC. Replace them with a few general, composable tools — for example a document reader plus code execution — that the agent combines per request.\nD. Add a second routing model that inspects each request and pre-selects which specialized tool the agent may call.",
+    "Back": "<b>Correct Answer: C.</b> Option C applies the tool-abstraction principle: agents work best with a small set of general tools they can combine in unanticipated ways — the same reason Claude Code ships with bash and file tools rather than a <code>refactor_tool</code> — so generic read-and-compute capabilities cover novel document types without minting a new tool per field. Option A improves selection among existing tools, but the observed failures are coverage gaps — requests with no matching tool — which no description can close. Option B compresses the list without adding capability; the enum still enumerates fields, so novel fields still fail. Option D is an over-engineered routing layer that spends effort choosing among tools that collectively still cannot do the job.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.6</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/building-effective-agents\">Building effective agents (Anthropic engineering)</a>\n&bull; <a href=\"https://www.anthropic.com/learn\">Anthropic Academy</a>"
+   },
+   "tags": [
+    "domain::d1",
+    "task::1-6"
+   ],
+   "guid_key": {
+    "source": "ccarf-claude-with-the-anthropic-api",
+    "slug": "agent-abstract-tools",
+    "ordinal": 1
+   },
+   "media": []
+  }
+ ]
+}
