@@ -64,25 +64,6 @@
   {
    "type": "basic",
    "fields": {
-    "Front": "Your pipeline classifies contract clauses with one identical prompt per clause, on a Claude model that accepts sampling parameters; the requests leave them at their defaults. Re-running the same clause through the same prompt yields a different label on about 15% of runs, which breaks your regression tests. Each individual label is plausible; the outputs simply vary from run to run.\n\nWhich change most directly reduces the run-to-run variation?\n\nA. Increase <code>max_tokens</code> so the model has more room to settle on a single answer for each clause.\nB. Add richer definitions of each label to the prompt so the model has additional guidance.\nC. Switch to a higher-intelligence model tier, which samples less randomly by default.\nD. Set <code>temperature</code> to 0 so the model favors the highest-probability token at each step.",
-    "Back": "<b>Correct Answer: D.</b> Option D is correct: on a model that accepts it, <code>temperature</code> controls sampling randomness. It defaults to 1.0, and at 0 the model favors the highest-probability token instead of sampling more freely — the low setting the API reference suggests for analytical tasks such as classification that must be consistent. Results are still not fully deterministic even at 0, so a small residual variance can remain, but this is the lever that most directly targets run-to-run variation. Option A is an output-length cap unrelated to sampling. Option B can help genuinely ambiguous clauses but does not remove sampling randomness on identical input. Option C is wrong because model tier does not govern sampling randomness. Currency note (Oct 2026): <code>temperature</code> is now deprecated — models released after Claude Opus 4.6 reject any non-default value with a 400 error, and current docs say to steer consistency through prompting instead.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/glossary#temperature\">Glossary — Temperature</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/working-with-messages#basic-request-and-response\">Using the Messages API — Basic request and response</a>"
-   },
-   "tags": [
-    "domain::d1",
-    "task::1-1",
-    "revised::2026-10",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-claude-with-the-anthropic-api",
-    "slug": "basics-temperature-determinism",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
     "Front": "Your report-generation service produces multi-page summaries. In 8% of runs the returned text ends mid-sentence, and in every such case the response's <code>stop_reason</code> is <code>max_tokens</code>. The affected calls return HTTP 200 and nothing is logged as an error.\n\nWhat is happening, and what is the appropriate fix?\n\nA. The response filled the context window (<code>model_context_window_exceeded</code>); shorten or split the source documents.\nB. The output hit your configured <code>max_tokens</code> cap; raise it or continue the response in a follow-up request.\nC. The model stopped on its own (<code>end_turn</code>); instruct it in the prompt to finish its sentences.\nD. A transient service fault truncated the output; add automatic retries with exponential backoff.",
     "Back": "<b>Correct Answer: B.</b> Option B is correct: a <code>stop_reason</code> of <code>max_tokens</code> means output generation reached the limit you set. <code>max_tokens</code> is a safety cap, not a target length, so the fix is a larger cap or a continuation request. Option A names a different stop reason: <code>model_context_window_exceeded</code> reports that the response filled the model's context window, but this response reported <code>max_tokens</code>. Option C describes <code>end_turn</code>, where Claude finishes its response naturally; this output was cut off by a hard cap, and prompt wording cannot lift it. Option D is wrong because nothing failed — the calls succeeded, and the cap is deterministic, so retries reproduce the same truncation.\n\n<i>Domain 1 (Agentic Architecture & Orchestration) · Task 1.1</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons#max-tokens\">Stop reasons and fallback — max_tokens</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons#ensuring-complete-responses\">Stop reasons and fallback — Ensuring complete responses</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Messages API reference</a>"
    },
@@ -659,96 +640,6 @@
   {
    "type": "basic",
    "fields": {
-    "Front": "You are building a Q&amp;A assistant over 4,000 pages of developer documentation written in markdown with consistent <code>##</code> section headers. The current pipeline splits every page into fixed 500-character chunks, and retrieval review shows that 35% of retrieved chunks start or end mid-sentence, often combining the tail of one topic with the head of the next. Users complain that answers cite loosely related sections.\n\nWhich chunking change most directly addresses the problem?\n\nA. Reduce the chunk size from 500 to 200 characters so each chunk spans fewer topics.\nB. Switch to an embedding model with higher-dimensional vectors for finer-grained similarity.\nC. Chunk on the markdown headers so each chunk is one complete, single-topic section.\nD. Retrieve 20 chunks per query instead of 5 so relevant content is more likely to be present.",
-    "Back": "<b>Correct Answer: C.</b> Option C is correct: structure-based chunking is the right strategy when documents carry reliable structure, and splitting on the <code>##</code> headers yields complete, coherent, single-topic chunks, eliminating mid-sentence cuts and mixed-topic chunks at the source. Option A makes fragmentation worse, since smaller fixed-size chunks cut even more sentences and carry less context each. Option B changes how chunks are represented, but the chunks themselves still mix topics, so better vectors index the same flawed units. Option D compensates by stuffing more partially relevant chunks into the prompt, raising cost and distraction without improving chunk quality.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/contextual-retrieval#implementation-considerations\">Introducing Contextual Retrieval (Anthropic engineering) — Implementation considerations</a>\n&bull; <a href=\"https://www.anthropic.com/engineering/contextual-retrieval#the-context-conundrum-in-traditional-rag\">Introducing Contextual Retrieval (Anthropic engineering) — The context conundrum in traditional RAG</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/glossary#rag-retrieval-augmented-generation\">Glossary — RAG (Retrieval augmented generation)</a>"
-   },
-   "tags": [
-    "domain::d5",
-    "task::5-4",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-claude-with-the-anthropic-api",
-    "slug": "rag-structure-based-chunking",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
-    "Front": "Your RAG pipeline ingests exported support tickets with no reliable formatting, so you fall back to size-based chunking. Evaluation shows failures concentrated at chunk boundaries: sentences are cut in half, and a chunk often lacks the preceding sentence that established what a pronoun refers to. Ticket formats vary too much for header- or section-based splitting to work.\n\nWhat is the most appropriate first adjustment to the chunking step?\n\nA. Add overlap so each chunk also includes a portion of the text from its neighboring chunks.\nB. Move to semantic chunking that groups related sentences using an NLP similarity model.\nC. Double the number of chunks retrieved per query to compensate for the boundary losses.\nD. Embed each chunk twice with two different embedding models to raise the odds of a match.",
-    "Back": "<b>Correct Answer: A.</b> Option A is the standard remedy when size-based chunking must be used: overlapping neighboring chunks preserves boundary context, so the cut-off sentence and the antecedent of that pronoun appear intact in at least one chunk, at the modest cost of some duplicated text. Option B reaches for the most complex chunking strategy before the simple, common fix has been tried. Option C retrieves more chunks that all still have damaged boundaries — more context, same defect, higher cost. Option D changes the representation rather than the content: both embeddings describe the same truncated chunk.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/contextual-retrieval#implementation-considerations\">Introducing Contextual Retrieval (Anthropic engineering) — Implementation considerations</a>\n&bull; <a href=\"https://www.anthropic.com/engineering/contextual-retrieval#the-context-conundrum-in-traditional-rag\">Introducing Contextual Retrieval (Anthropic engineering) — The context conundrum in traditional RAG</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/glossary#rag-retrieval-augmented-generation\">Glossary — RAG (Retrieval augmented generation)</a>"
-   },
-   "tags": [
-    "domain::d5",
-    "task::5-4",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-claude-with-the-anthropic-api",
-    "slug": "rag-chunk-overlap",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
-    "Front": "Your developer-tools knowledge base is indexed with embeddings only. When users search for exact identifiers — error codes like <code>ERR_CONN_4012</code>, flag names, function names — evaluation shows the right document reaching the top five results only 41% of the time, while natural-language concept questions score 87%. The failing queries all hinge on rare, specific terms that appear verbatim in just a handful of documents.\n\nWhat change to the retrieval layer best addresses the failing queries?\n\nA. Increase the number of retrieved chunks from 5 to 20 whenever a query contains an identifier.\nB. Prompt Claude to reason about which retrieved chunks look most relevant before answering.\nC. Re-embed the corpus with a larger embedding model that captures identifiers more precisely.\nD. Add a BM25 lexical index alongside the vector index and merge results from both.",
-    "Back": "<b>Correct Answer: D.</b> Option D targets the root cause: BM25 ranks by exact term matches and weights rare terms highly — precisely the signal that semantic embeddings under-represent — so hybrid search covers identifier queries while embeddings keep handling paraphrased concept questions. Option A retrieves more semantically similar but still wrong chunks; the exact-match signal is absent no matter how many results you take. Option B cannot help because the correct chunk was never retrieved — the model cannot reason its way to content that is not in the prompt. Option C still relies on semantic similarity, which remains the wrong matching paradigm for verbatim rare tokens.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/contextual-retrieval#a-primer-on-rag-scaling-to-larger-knowledge-bases\">Introducing Contextual Retrieval (Anthropic engineering) — A primer on RAG: scaling to larger knowledge bases</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/glossary#rag-retrieval-augmented-generation\">Glossary — RAG (Retrieval augmented generation)</a>"
-   },
-   "tags": [
-    "domain::d5",
-    "task::5-4",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-claude-with-the-anthropic-api",
-    "slug": "rag-bm25-exact-terms",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
-    "Front": "An internal search service over HR policy documents uses BM25 lexical search only. Employees phrase questions conversationally — 'can I get money back for a canceled trip' — while the documents say 'reimbursement for travel cancellations.' For paraphrased queries that share almost no vocabulary with the documents, the correct policy lands in the top five results only 30% of the time, although keyword-style queries work well.\n\nWhich change best fixes the paraphrased-query failures?\n\nA. Append a glossary of keyword synonyms to every document so more query terms can match.\nB. Add a semantic embedding index and combine its results with the BM25 results.\nC. Tokenize queries more aggressively, stripping stop words and punctuation before matching.\nD. Boost the BM25 weighting of the rarest terms in each query so they dominate the ranking.",
-    "Back": "<b>Correct Answer: B.</b> Option B addresses the failure mode directly: embeddings represent meaning, so 'money back' and 'reimbursement' land near each other in vector space even with zero shared vocabulary, and keeping BM25 in the hybrid preserves the exact-term strength that already works. Option A is a manual, perpetually incomplete synonym list that must be maintained by hand. Option C still matches only shared vocabulary — the failing queries share none, so cleaner tokens change nothing. Option D sharpens exact-term matching, which is the mechanism that is failing, and does nothing for queries whose terms never appear in the documents.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/contextual-retrieval#a-primer-on-rag-scaling-to-larger-knowledge-bases\">Introducing Contextual Retrieval (Anthropic engineering) — A primer on RAG: scaling to larger knowledge bases</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/embeddings\">Embeddings</a>"
-   },
-   "tags": [
-    "domain::d5",
-    "task::5-4",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-claude-with-the-anthropic-api",
-    "slug": "rag-embeddings-paraphrase",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
-    "Front": "Your multi-index pipeline queries a vector index and a BM25 index in parallel. The vector index returns cosine distances between 0 and 2, while BM25 returns unbounded relevance scores that shift with corpus statistics. Your first merge implementation averaged the two raw scores per document, and documents from one index now systematically dominate the final ranking.\n\nHow should the two result lists be combined?\n\nA. Merge with Reciprocal Rank Fusion, scoring each document by its rank position in each list.\nB. Normalize the BM25 scores into the 0-2 range, then continue averaging the raw scores.\nC. Return vector results by default and fall back to BM25 only when vector search finds nothing.\nD. Deduplicate the two lists and interleave them, alternating one result from each index.",
-    "Back": "<b>Correct Answer: A.</b> Option A is the standard multi-index merge: Reciprocal Rank Fusion uses only rank positions (summing terms like 1/(rank + 1) across the lists), which sidesteps incomparable score scales entirely and rewards documents that rank well in both indexes. Option B makes the ranges superficially aligned, but the two scores measure different quantities and the BM25 distribution shifts as the corpus changes, so the blended number stays unstable; rank positions are robust to both problems. Option C discards the lexical signal on nearly every query instead of combining the paradigms — the goal of running both indexes. Option D preserves each list's order but ignores cross-index agreement, so a document ranked highly by both methods gets no advantage over one favored by only one.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/contextual-retrieval#a-primer-on-rag-scaling-to-larger-knowledge-bases\">Introducing Contextual Retrieval (Anthropic engineering) — A primer on RAG: scaling to larger knowledge bases</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/glossary#rag-retrieval-augmented-generation\">Glossary — RAG (Retrieval augmented generation)</a>"
-   },
-   "tags": [
-    "domain::d5",
-    "task::5-4",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-claude-with-the-anthropic-api",
-    "slug": "rag-rrf-merge",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
     "Front": "You are designing retrieval for two systems. System 1 answers customer questions over a stable 60,000-page product manual and must ground answers with sub-second retrieval at thousands of queries per hour. System 2 is an engineering assistant answering deep questions over a monorepo where hundreds of files change daily; engineers accept multi-minute answers, but stale results are unacceptable.\n\nWhich retrieval architecture pairing best fits the two systems?\n\nA. Agentic search for both systems, letting an agent iteratively run search tools per query.\nB. A RAG embedding pipeline for both systems, re-embedding the monorepo on a nightly schedule.\nC. Agentic search for System 1 and a pre-built RAG embedding pipeline for System 2.\nD. A RAG embedding pipeline for System 1 and agentic search over the live repository for System 2.",
     "Back": "<b>Correct Answer: D.</b> Option D matches each approach to its strengths: a pre-built index gives System 1 fast, single-shot retrieval over a corpus that rarely changes, while agentic search reads the live files at query time for System 2, so results are never stale and the agent can iteratively refine its queries — at a latency cost System 2 explicitly tolerates. Option A sacrifices System 1's latency target, since an agent running multiple search turns per query cannot deliver sub-second retrieval at that volume. Option B leaves System 2 up to a day stale between re-embedding runs, violating its freshness requirement while adding constant index maintenance. Option C inverts the fit on both axes, giving the latency-sensitive system the slow approach and the fast-changing corpus the stale one.\n\n<i>Domain 5 (Context Management & Reliability) · Task 5.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents#context-retrieval-and-agentic-search\">Effective context engineering for AI agents (Anthropic engineering) — Context retrieval and agentic search</a>\n&bull; <a href=\"https://www.anthropic.com/engineering/contextual-retrieval#a-primer-on-rag-scaling-to-larger-knowledge-bases\">Introducing Contextual Retrieval (Anthropic engineering) — A primer on RAG: scaling to larger knowledge bases</a>"
    },
@@ -795,25 +686,6 @@
    "guid_key": {
     "source": "ccarf-claude-with-the-anthropic-api",
     "slug": "feat-thinking-when-to-enable",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
-    "Front": "On a Claude model that takes a fixed thinking budget, you enabled extended thinking with a 32,000-token budget on every request in an assistant that handles both trivial lookups and complex multi-document analyses. Since the change, p50 latency is up 45% and spend has risen sharply, but eval accuracy improved only on the complex analyses — about 15% of traffic — and stayed flat everywhere else.\n\nHow should you configure thinking going forward?\n\nA. Keep the large budget for the complex analyses and turn thinking off or down for simple lookups, checking both with evals.\nB. Keep the 32,000-token budget everywhere but strip the thinking blocks out of responses so users have less content to wait for.\nC. Keep thinking on everywhere and raise the budget above <code>max_tokens</code> so that reasoning never crowds out room for the final answer.\nD. Keep the uniform budget but add a system-prompt instruction telling the model to think only briefly on easy questions.",
-    "Back": "<b>Correct Answer: A.</b> Option A matches thinking depth to task complexity: thinking tokens are billed as output and add latency, and their accuracy gains show diminishing returns on tasks that do not need deep reasoning, so a large budget belongs on the 15% of traffic where it measurably helps and not on trivial lookups. Option B misunderstands the cost — thinking tokens are generated and billed whether or not they are returned, so spend does not fall. Option C is an invalid configuration, since the thinking budget must be below <code>max_tokens</code> (thinking counts toward it), and it would make the overspending worse. Option D leans on instruction-following for a tradeoff that a per-request setting controls directly; the setting is the first lever and prompt steering the second. Currency note (Oct 2026): <code>budget_tokens</code> is deprecated on Claude 4.6 models and rejected on Claude 4.7 and later, where adaptive thinking decides per request whether to think and <code>effort</code> is the main control.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.5</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/extended-thinking#budget-rules-and-tuning\">Extended thinking — Budget rules and tuning</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/thinking#thinking-and-effort\">Thinking — Thinking and effort</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/thinking-steering-and-cost#effort-levels\">Steering thinking — Effort levels</a>"
-   },
-   "tags": [
-    "domain::d4",
-    "task::4-5",
-    "revised::2026-10",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-claude-with-the-anthropic-api",
-    "slug": "feat-thinking-budget-tradeoff",
     "ordinal": 1
    },
    "media": []

@@ -125,23 +125,6 @@
   {
    "type": "basic",
    "fields": {
-    "Front": "You manage a customer-insights team. A teammate asks how your AI assistant can both discuss an obscure historical topic in depth and reliably follow instructions like \"give me three bullet points in a formal tone.\"\n\nWhich explanation matches the two-stage learning process described in Anthropic's AI Fluency course?\n\nA. Fine-tuning builds broad knowledge of the world from vast amounts of text, and pre-training then teaches the model to follow instructions.\nB. The model memorizes a fact database during training and consults a built-in search engine whenever it needs to follow instructions.\nC. The model learns continuously during each conversation, permanently updating its training as it reads your messages and replies.\nD. Pre-training builds broad capability from patterns in vast amounts of text, and fine-tuning then teaches the model to follow instructions.",
-    "Back": "<b>Correct Answer: D.</b> Option D matches the course: generative AI learns first through pre-training, absorbing patterns from vast amounts of text, and then through fine-tuning, in which it learns to follow instructions and provide helpful responses. Option A names the right stages but swaps their roles. Option B substitutes a database-plus-search picture that the course contrasts with how generative models actually work. Option C confuses conversation with training; reading your messages provides temporary context within a session but does not update the model's underlying training.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://academy.claude.com/courses/ai-fluency-framework-foundations/capabilities-limitations#key-takeaways\">Capabilities &amp; limitations — Key takeaways (AI Fluency course)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/glossary#pretraining\">Glossary — Pretraining</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/about-claude/glossary#fine-tuning\">Glossary — Fine-tuning</a>"
-   },
-   "tags": [
-    "domain::d4",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-ai-fluency-framework-foundations",
-    "slug": "genai-pretraining-finetuning",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
     "Front": "You are an analyst who has just learned that your AI assistant generates responses probabilistically rather than retrieving stored answers, and that it can produce confident, fluent text that is wrong.\n\nWhich adjustment to your working style follows most directly from that understanding?\n\nA. Run each question three times in separate chats and rely on the claims that appear in each of the three replies.\nB. Treat first responses as drafts to refine through iteration, and verify factual claims before relying on them.\nC. Invest in one detailed prompt covering the full set of requirements, and treat the first reply as final.\nD. Spot-check the passages where the assistant sounds unsure, and trust the passages that read as fluent and confident.",
     "Back": "<b>Correct Answer: B.</b> Option B draws the right working implications: because outputs are generated rather than retrieved, results vary and improve through iterative refinement, and because generation can be confidently wrong, factual claims need verification. Anthropic's AI Fluency course frames AI as an interactive partner, not a database or vending machine. Option A mistakes agreement for accuracy: a model can reproduce the same inaccuracy run after run, so matching replies do not verify a claim. Option C relies on Description alone: a detailed prompt improves the odds of a good first reply but cannot rule out confident errors, and treating the first reply as final skips both iteration and checking. Option D treats fluency and confidence as evidence of accuracy, exactly the trap hallucinations exploit, because a wrong claim can read as smoothly as a right one.\n\n<i>Domain 4 (Prompt Engineering & Structured Output)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://academy.claude.com/courses/ai-fluency-framework-foundations/capabilities-limitations\">Capabilities &amp; limitations (AI Fluency course)</a>\n&bull; <a href=\"https://academy.claude.com/courses/ai-fluency-framework-foundations/a-closer-look-at-description#key-takeaways\">A closer look at Description — Key takeaways (AI Fluency course)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations\">Reduce hallucinations</a>"
    },

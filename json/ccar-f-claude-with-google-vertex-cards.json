@@ -619,26 +619,6 @@
   {
    "type": "basic",
    "fields": {
-    "Front": "A team running Claude Haiku 4.5 on Vertex AI is tuning a request that asks for three sample CLI commands, and may change only the assistant prefill and the stop sequences. With a prefill of just three backticks and a stop sequence of three backticks, the output starts with the word <code>bash</code> on its own line, sometimes contains only one command, and includes shell comments.\n\nWhich TWO settings produce all three commands in one block with no comments? (Select TWO.)\n\nA. Prefill with a guiding sentence ('Here are all three commands in one block without comments:'), a newline, and the opening fence tagged <code>bash</code>.\nB. Prefill with just the opening fence tagged <code>bash</code> and a newline, leaving Claude to choose how many commands to write in the block.\nC. Use <code>#</code> as the stop sequence in place of the closing fence, ending generation before a shell comment is written to the output.\nD. Keep the closing fence (three backticks) as the stop sequence, ending generation as soon as the block closes after the last command.",
-    "Back": "<b>Correct Answer: A and D.</b> Options A and D are correct. The <code>bash</code> line appears because Claude continues a bare fence with a language identifier; including <code>bash</code> in the prefill removes it, and a prefilled sentence steers Claude to put all three commands in one block without comments, since a prefill can carry any text, not only delimiters. The closing-fence stop sequence still terminates generation at the end of the block. Option B removes the stray <code>bash</code> line but gives Claude no steer toward three commands in one block without comments, so the other two symptoms remain. Option C ends generation at the first <code>#</code>, so every command written after a comment is lost. Currency note (Oct 2026): prefill is not supported on Claude 4.6 and later models, where a prefilled request returns a 400 error; current docs steer format with direct instructions, XML tags or structured outputs instead.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#migrating-away-from-prefilled-responses\">Prompting best practices — Migrating away from prefilled responses</a>\n&bull; <a href=\"https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/claude/use-claude#use_a_curl_command\">Request predictions with Claude models — Use a curl command (Google Cloud docs)</a>"
-   },
-   "tags": [
-    "domain::d4",
-    "task::4-3",
-    "format::multi-response",
-    "revised::2026-10",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-claude-with-google-vertex",
-    "slug": "output-exercise-bash-prefill-guidance",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
     "Front": "Your media pipeline runs Claude Haiku 4.5 on Vertex AI, prefills the assistant turn with the opening of a fenced code block and sets the closing fence as a stop sequence. The post-processor then searches the response for the closing fence to cut the block out and raises an error on 100% of responses.\n\nWhat explains this?\n\nA. The stop sequence text is not included in the returned response; treat the block as ending where the response ends.\nB. Stop sequences are ignored when a prefill is present; remove the prefill so that the fence is emitted.\nC. The closing fence is returned with a trailing newline that the search does not match; trim the whitespace first.\nD. The model emits the closing fence only when <code>max_tokens</code> is large enough; raise the limit.",
     "Back": "<b>Correct Answer: A.</b> Option A is correct: when Claude generates a stop sequence, generation halts and the matched text is excluded from the returned content, so the closing fence never appears and the response simply ends at the end of the block. Option B: prefill and stop sequences are designed to be combined. Option C: nothing at or after the stop sequence is returned at all. Option D: <code>max_tokens</code> has no bearing on stop-sequence exclusion. Currency note (Oct 2026): prefill is not supported on Claude 4.6 and later models, where a prefilled request returns a 400 error; stop sequences remain part of the Messages API.\n\n<i>Domain 4 (Prompt Engineering & Structured Output) · Task 4.3</i>\n\n<b>References:</b>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons#stop-sequence\">Stop reasons and fallback — stop_sequence</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/api/messages/create\">Create a Message (Claude API reference)</a>\n&bull; <a href=\"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#migrating-away-from-prefilled-responses\">Prompting best practices — Migrating away from prefilled responses</a>"
    },

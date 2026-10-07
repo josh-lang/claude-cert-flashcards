@@ -617,25 +617,6 @@
   {
    "type": "basic",
    "fields": {
-    "Front": "Your hand-rolled MCP client spawns a server subprocess and immediately writes a bare list-tools request to its stdin, with no other messages and no request metadata. The request hangs or comes back as an error, while a reference client built on the official SDK works against the same server every time.\n\nWhich step is your client missing?\n\nA. Adding a fixed two-second delay between launching the subprocess and writing the first list-tools request to the pipe that feeds its stdin.\nB. Retrying the list-tools request with exponential backoff until the server starts answering, and giving up after several attempts.\nC. Switching the server from stdio to Streamable HTTP and delivering the same list-tools request as an HTTP POST to a single endpoint.\nD. Telling the server which protocol version and capabilities the client supports, in the form that server's protocol revision requires.",
-    "Back": "<b>Correct Answer: D.</b> Option D is correct. An MCP server has to know which protocol version the client speaks and what capabilities it has before it will serve operational requests such as list-tools. In protocol revisions up to 2025-11-25 the client supplies this once, in an <code>initialize</code> request that the server answers with its own capabilities, followed by an <code>initialized</code> notification. In the 2026-07-28 revision that handshake is gone, and every request carries the version and client capabilities in its <code>_meta</code> field instead. A bare request does neither, whereas the SDK client works out which form the server expects when it connects. Options A and B treat a protocol precondition as a timing flake; delays and retries cannot supply information the request never carries. Option C changes the transport even though the reference client works against the same server, so the transport is not what is missing: an HTTP POST would carry the same bare request with none of the version or capability information.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://modelcontextprotocol.io/specification/latest/basic/versioning#protocol-version-negotiation\">MCP spec: versioning — Protocol version negotiation</a>\n&bull; <a href=\"https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle\">MCP spec: lifecycle (2025-11-25 revision)</a>\n&bull; <a href=\"https://py.sdk.modelcontextprotocol.io/client#whats-on-a-connected-client\">MCP Python SDK: client — What's on a connected client</a>"
-   },
-   "tags": [
-    "domain::d2",
-    "task::2-4",
-    "revised::2026-10",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-introduction-to-model-context-protocol",
-    "slug": "client-initialize-handshake",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
     "Front": "Your client assumes every MCP server implements tools, resources, and prompts. Connected to a minimal tools-only server, it calls list-prompts at startup and treats the resulting failure as fatal — aborting the session even though every tool works.\n\nWhat is the correct fix?\n\nA. Read the server's declared capabilities and exercise only the features that it actually advertises.\nB. Require server teams to implement all three primitives before your client will accept a connection to them.\nC. Wrap list-prompts in a retry loop, since prompt support may finish loading shortly after server startup.\nD. Delegate the check to the model by asking Claude at session start whether this server provides prompts.",
     "Back": "<b>Correct Answer: A.</b> Option A is correct. Tools, resources and prompts are optional features, each server declares which of them it supports, and a well-behaved client consults that declaration instead of assuming the full set. The declaration arrives in the <code>initialize</code> response under handshake-based protocol revisions and in the <code>server/discover</code> result under the 2026-07-28 revision, and the SDK exposes it on the client once it has connected. Option B inverts the fix by demanding servers change to satisfy a faulty client assumption; the primitives are optional by design. Option C misreads a permanent capability absence as a transient warm-up condition. Option D asks the model to know something it cannot observe; capability information arrives through the protocol, not the conversation.\n\n<i>Domain 2 (Tool Design & MCP Integration) · Task 2.4</i>\n\n<b>References:</b>\n&bull; <a href=\"https://modelcontextprotocol.io/specification/latest/architecture/index#capability-negotiation\">MCP spec: architecture — Capability negotiation</a>\n&bull; <a href=\"https://modelcontextprotocol.io/specification/latest/server/discover#response\">MCP spec: discovery — Response</a>\n&bull; <a href=\"https://py.sdk.modelcontextprotocol.io/client#whats-on-a-connected-client\">MCP Python SDK: client — What's on a connected client</a>"
    },

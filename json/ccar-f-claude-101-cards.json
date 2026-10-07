@@ -346,24 +346,6 @@
   {
    "type": "basic",
    "fields": {
-    "Front": "A marketing manager on a Pro plan built an interactive event-FAQ page as an artifact in a chat early in 2026 and has now published it, planning to send the public link to 15 outside vendors who do not use Claude. A colleague warns her that publishing will expose the conversation that produced it.\n\nWhat is accurate about an artifact published this way?\n\nA. Publishing exposes the chat that produced the artifact, and vendors can read the full transcript alongside it.\nB. Viewers have to create a free Claude account first, and the published link opens for them only after they sign in.\nC. The selected version becomes public while the chat stays private, and viewers need no Claude account to view it.\nD. Publishing is permanent, and she cannot unpublish the artifact once the link has been shared with vendors.",
-    "Back": "<b>Correct Answer: C.</b> Option C captures how a published chat artifact of this kind behaves: the selected version becomes accessible to anyone with the link, the underlying chat remains private, and no Claude account is needed to view it. Option A is the exact misconception the colleague has — the conversation is not exposed. Option B is wrong here because the public link opens without an account, which is the point of sending it to outside vendors. Option D is wrong because she can unpublish to revoke access. Currency note (Oct 2026): this is the behavior of what the Help Center now calls legacy artifacts, those made in a chat before September 16, 2026; newer artifacts start private, anyone opening a shared one needs a Claude account, and a legacy artifact cannot be published again once it is unpublished.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://support.claude.com/en/articles/9547008-share-artifacts#h_d439706a0e\">Share artifacts: Publish a legacy artifact on Free, Pro, and Max plans (Claude Help Center)</a>\n&bull; <a href=\"https://support.claude.com/en/articles/9547008-share-artifacts#h_333cbc7307\">Share artifacts: Who can open a shared artifact (Claude Help Center)</a>\n&bull; <a href=\"https://support.claude.com/en/articles/17153992-what-are-artifacts-and-how-do-i-use-them#h_40364ba6f4\">What are artifacts and how do I use them? What is an artifact? (Claude Help Center)</a>"
-   },
-   "tags": [
-    "domain::d3",
-    "revised::2026-10",
-    "flag::retire-candidate"
-   ],
-   "guid_key": {
-    "source": "ccarf-claude-101",
-    "slug": "artifact-publish-privacy",
-    "ordinal": 1
-   },
-   "media": []
-  },
-  {
-   "type": "basic",
-   "fields": {
     "Front": "An HR lead asks Claude for a reusable onboarding-checklist template she plans to edit and share with three regional offices. Artifacts have opened normally in her other chats, but here Claude writes the whole checklist inline in the chat response instead of creating one.\n\nWhat is the simplest way to get it as an artifact?\n\nA. Reply 'Please create that as an artifact' — an explicit request is all it takes in the same conversation.\nB. Ask a workspace admin to enable artifact creation for her account before trying the request again.\nC. Accept the inline version — text templates cannot be artifacts, since only code qualifies for the window.\nD. Start a new conversation, because Claude's artifact decision is fixed for the rest of the current chat.",
     "Back": "<b>Correct Answer: A.</b> Option A is the simple fix: if Claude does not automatically create an artifact when you expect one, just ask — 'create this as an artifact' — and it will move the content into the artifact window. Option B is unnecessary: artifacts already open for her in other chats, so nothing is switched off for her account or organization. Option C is false; text-heavy documents such as templates and plans are a primary artifact type. Option D is unnecessary because the decision is not locked — a one-line follow-up in the same conversation fixes it.\n\n<i>Domain 3 (Claude Code Configuration & Workflows)</i>\n\n<b>References:</b>\n&bull; <a href=\"https://support.claude.com/en/articles/17153992-what-are-artifacts-and-how-do-i-use-them#h_40364ba6f4\">What are artifacts and how do I use them? What is an artifact? (Claude Help Center)</a>\n&bull; <a href=\"https://support.claude.com/en/articles/16994751-artifacts-admin-guide-for-team-and-enterprise-plans\">Artifacts admin guide for Team and Enterprise plans (Claude Help Center)</a>"
    },
